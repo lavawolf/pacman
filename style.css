@@ -1,0 +1,19 @@
+body {
+  background-color: black;
+}
+
+@font-face {
+  font-family: 'pacfontregular';
+  src: url('fonts/pac-font-webfont.woff2') format('woff2'),
+       url('fonts/pac-font-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+#title {
+  font-family: 'pacfontregular';
+  font-size: 50px;
+  color:yellow;
+  display: inline-block;
+}
