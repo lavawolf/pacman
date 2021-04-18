@@ -1,9 +1,10 @@
 'use strict';
 
-const gridWidth = 50
-const gridHeight = 40
+const gridHeight = 10
+const gridWidth = 20
 
 const game = document.querySelector('#game')
+
 
 class Cell {
   static blockState = 0
@@ -35,13 +36,13 @@ class Cell {
 
       case Cell.pointState:
         let childPoint = document.createElement('div')
-        childPoint.classList.add('cell_point')
+        childPoint.classList.add('point')
         cell.appendChild(childPoint)
         break
 
       case Cell.powerState:
         let child = document.createElement('div')
-        child.classList.add('cell_power')
+        child.classList.add('power')
         cell.appendChild(child)
         break
     }
@@ -53,16 +54,24 @@ class Cell {
 
 
 function main() {
+  game.style.height = `${gridHeight * 40 + 20}px`
+  game.style.width = `${gridWidth * 40 + 40}px`
   const grid = []
-  for (let i = 0; i < gridHeight; i++) {
-    grid.push(Array(gridWidth).fill(new Cell(0)))
+  for (let i = 0; i < gridWidth; i++) {
+    grid.push(Array(gridHeight).fill(new Cell(0)))
   }
-  console.log(grid[4][5].state)
-  game.appendChild(grid[4][5].render())
+  render(grid)
 }
 
 function render(grid) {
-  
+  for (let col of grid) {
+    const gridCol = document.createElement('div')
+    gridCol.classList.add('row')
+    for (let cell of col) {
+      gridCol.appendChild(cell.render())
+    }
+    game.appendChild(gridCol)
+  }
 }
 
 

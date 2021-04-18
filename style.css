@@ -2,12 +2,6 @@ body {
   background-color: black;
 }
 
-/* *{
-  margin: 0px;
-  padding: 0px;
-  box-sizing: border-box;
-} */
-
 @font-face {
   font-family: 'pacfontregular';
   src: url('fonts/pac-font-webfont.woff2') format('woff2'),
@@ -25,7 +19,12 @@ body {
 }
 
 #game {
-  margin: 20px;
+  border: 2px solid blue;
+  overflow: hidden;
+  align-items: center;
+  display: flex;
+  margin: auto;
+  justify-content: center;
 }
 
 .cell {
@@ -34,7 +33,7 @@ body {
   background-color: black;
   margin: 0px;
   padding: 0px;
-  float: left;
+  border: 2px solid black;
 }
 
 .cell_block {
@@ -55,4 +54,19 @@ body {
   margin: 14px;
   border-radius: 50%;
   background-color: white;
+}
+
+.row {
+  margin: 0;
+}
+
+#scoreboard {
+  padding: 20px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  border: 2px solid green;
+  /* overflow: auto; */
+  /* align-items: center; */
+  display: flex;
+  /* justify-content: center; */
 }
