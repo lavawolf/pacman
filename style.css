@@ -94,7 +94,7 @@ body {
   top: 15%;
   transform: translateY(-15%);
   text-align: center;
-  animation: textzoom 10s;
+  animation: textzoom 5s infinite alternate;
 }
 
 .pacman {
@@ -104,7 +104,7 @@ body {
   top: 60%;
   left: 0%;
   transform: translate(0%, -60%);
-  animation: pacman-run 10s none;
+  animation: pacman-run 10s infinite alternate;
 }
 
 .ball {
@@ -114,7 +114,7 @@ body {
   top: 60%;
   left: 4%;
   transform: translate(4%, -60%);
-  animation: ball-run 10s none;
+  animation: ball-run 10s infinite alternate;
 }
 
 .finish-load {
