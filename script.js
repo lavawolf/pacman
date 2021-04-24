@@ -3,11 +3,7 @@
 window.addEventListener("load", setTimeout( function (event) {
   const preloader = document.querySelector(".pre-loader");
   preloader.classList.add("finish-load");
-<<<<<<< Updated upstream
 }, 4400));
-=======
-}, 10000));
->>>>>>> Stashed changes
 
 const gridHeight = 10
 const gridWidth = 20
