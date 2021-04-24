@@ -4,7 +4,7 @@
 window.addEventListener("load", setTimeout( function (event) {
   const preloader = document.querySelector(".pre-loader");
   preloader.classList.add("finish-load");
-}, 10000));
+}, 8500));
 
 const gridHeight = 10
 const gridWidth = 20
