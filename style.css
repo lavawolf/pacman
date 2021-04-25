@@ -71,6 +71,11 @@ body {
   /* justify-content: center; */
 }
 
+canvas {
+  background-color: transparent;
+  border: 5px solid grey;
+  position: absolute;
+}
 
 /*Preloading page CSS properties*/
 
