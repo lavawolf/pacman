@@ -8,7 +8,6 @@ body {
        url('fonts/pac-font-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-
 }
 
 #title {
@@ -28,8 +27,8 @@ body {
 }
 
 .cell {
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
   background-color: black;
   margin: 0px;
   padding: 0px;

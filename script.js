@@ -1,22 +1,44 @@
 'use strict';
 
-window.addEventListener("load", setTimeout( function (event) {
+window.addEventListener("load", () => setTimeout( function (event) {
   const preloader = document.querySelector(".pre-loader");
-  preloader.classList.add("finish-load");
+  preloader.remove();
+  main();
 }, 4400));
 
-const gridHeight = 10
-const gridWidth = 20
+const gridHeight = 10;
+const gridWidth = 20;
+const cellSize = 50;
+const pacSize = 40;
+const pacSpeed = 3;
 
-const game = document.querySelector('#game')
-const canvas = document.querySelector('canvas')
+const game = document.querySelector('#game');
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
 
+const pac1 = new Image();
+pac1.src = './pacman_characters/pacman_closed.png';
+
+const pac2 = new Image();
+pac2.src = './pacman_characters/pacman_eating.png';
+
+const dirMap = {
+  "ArrowLeft": 2,
+  "ArrowRight": 0,
+  "ArrowUp": 1,
+  "ArrowDown": 3,
+}
+
+let state = 0;
+let x = 0;
+let y = 0;
+let dir = 0;
 
 class Cell {
-  static blockState = 0
-  static noneState = 1
-  static pointState = 2
-  static powerState = 3
+  static blockState = 0;
+  static noneState = 1;
+  static pointState = 2;
+  static powerState = 3;
   
   #state;
 
@@ -31,12 +53,10 @@ class Cell {
   render() {
     const cell = document.createElement('div')
     cell.classList.add('cell')
-    console.log(Cell.blockState)
 
     switch (this.#state) {
       
       case Cell.blockState:
-        console.log('e')
         cell.classList.add('cell_block')
         break
 
@@ -60,28 +80,72 @@ class Cell {
 
 
 function main() {
-  game.style.height = `${gridHeight * 40 + 20}px`
-  game.style.width = `${gridWidth * 40 + 40}px`
-  canvas.style.height = game.style.height
-  canvas.style.width = game.style.width
-  const grid = []
+  const h = gridHeight * cellSize + 20;
+  const w = gridWidth * cellSize + 40;
+  game.style.height = `${h}px`;
+  game.style.width = `${w}px`;
+  canvas.style.height = game.style.height;
+  canvas.style.width = game.style.width;
+  ctx.canvas.height = h;
+  ctx.canvas.width = w;
+
+  window.addEventListener('keydown', (event) => {
+    dir = dirMap[event.key];
+    console.log(dir);
+  });
+  
+  const grid = [];
   for (let i = 0; i < gridWidth; i++) {
-    grid.push(Array(gridHeight).fill(new Cell(0)))
+    grid.push(Array(gridHeight).fill(new Cell(0)));
   }
-  render(grid)
+  renderGrid(grid);
+
+  requestAnimationFrame(animatePac);
 }
 
-function render(grid) {
+function renderGrid(grid) {
   for (let col of grid) {
-    const gridCol = document.createElement('div')
-    gridCol.classList.add('row')
+    const gridCol = document.createElement('div');
+    gridCol.classList.add('row');
     for (let cell of col) {
-      gridCol.appendChild(cell.render())
+      gridCol.appendChild(cell.render());
     }
-    game.appendChild(gridCol)
+    game.appendChild(gridCol);
   }
 }
 
+function animatePac() {
+  renderPac();
+  state = (state + 1) % 20;
+  
+  switch (dir) {
+    case 0:
+      x += pacSpeed;
+      break;
+    case 1:
+      y -= pacSpeed;
+      break;
+    case 2:
+      x -= pacSpeed;
+      break;
+    case 3:
+      y += pacSpeed;
+      break;
+  }
+  requestAnimationFrame(animatePac);
+}
 
-main()
-
+function renderPac() {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  // ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-Math.PI * dir / 2);
+  if (state > 10) {
+    ctx.drawImage(pac1, -pacSize / 2, -pacSize / 2, pacSize, pacSize);
+  } else {
+    ctx.drawImage(pac2, -pacSize / 2, -pacSize / 2, pacSize, pacSize);
+  }
+  ctx.rotate(Math.PI * dir / 2);
+  ctx.translate(-x, -y);
+  // ctx.restore();
+}
