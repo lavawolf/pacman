@@ -94,7 +94,7 @@ body {
   top: 15%;
   transform: translateY(-15%);
   text-align: center;
-  animation: textzoom 5s infinite alternate;
+  animation: textzoom 5s;
   animation-timing-function: linear;
 }
 
@@ -105,7 +105,7 @@ body {
   top: 60%;
   left: 0%;
   transform: translate(0%, -60%);
-  animation: pacman-run 5s infinite alternate;
+  animation: pacman-run 5s;
   animation-timing-function: linear;
 }
 
@@ -116,7 +116,7 @@ body {
   top: 60%;
   left: 4%;
   transform: translate(4%, -60%);
-  animation: ball-run 5s infinite alternate;
+  animation: ball-run 5s;
   animation-timing-function: linear;
 }
 
