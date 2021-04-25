@@ -8,7 +8,6 @@ body {
        url('fonts/pac-font-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-
 }
 
 #title {
@@ -28,8 +27,8 @@ body {
 }
 
 .cell {
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
   background-color: black;
   margin: 0px;
   padding: 0px;
@@ -71,6 +70,11 @@ body {
   /* justify-content: center; */
 }
 
+canvas {
+  background-color: transparent;
+  border: 5px solid grey;
+  position: absolute;
+}
 
 /*Preloading page CSS properties*/
 
@@ -99,7 +103,7 @@ body {
   top: 15%;
   transform: translateY(-15%);
   text-align: center;
-  animation: textzoom 5s infinite alternate;
+  animation: textzoom 5s;
   animation-timing-function: linear;
 }
 
@@ -110,7 +114,7 @@ body {
   top: 60%;
   left: 0%;
   transform: translate(0%, -60%);
-  animation: pacman-run 5s infinite alternate;
+  animation: pacman-run 5s;
   animation-timing-function: linear;
 }
 
@@ -121,7 +125,7 @@ body {
   top: 60%;
   left: 4%;
   transform: translate(4%, -60%);
-  animation: ball-run 5s infinite alternate;
+  animation: ball-run 5s;
   animation-timing-function: linear;
 }
 
