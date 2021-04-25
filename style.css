@@ -76,3 +76,83 @@ canvas {
   border: 5px solid grey;
   position: absolute;
 }
+
+/*Preloading page CSS properties*/
+
+.pre-loader {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.5s ease-out;
+}
+
+#title-preload {
+  position: absolute;
+  font-family: 'pacfontregular';
+  font-size: 20px;
+  color:yellow;
+  top: 15%;
+  transform: translateY(-15%);
+  text-align: center;
+  animation: textzoom 5s infinite alternate;
+  animation-timing-function: linear;
+}
+
+.pacman {
+  position: absolute;
+  height: 60px;
+  width: 60px;
+  top: 60%;
+  left: 0%;
+  transform: translate(0%, -60%);
+  animation: pacman-run 5s infinite alternate;
+  animation-timing-function: linear;
+}
+
+.ball {
+  position: absolute;
+  height: 25px;
+  width: 25px;
+  top: 60%;
+  left: 4%;
+  transform: translate(4%, -60%);
+  animation: ball-run 5s infinite alternate;
+  animation-timing-function: linear;
+}
+
+.finish-load {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes textzoom {
+  0%{
+    font-size: 90px;
+  }
+  100%{
+    font-size: 125px;
+  }
+}
+
+@keyframes pacman-run {
+  from {
+    left: 0%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes ball-run {
+  from {
+    left: 6%;
+  }
+  to {
+    left: 106%;
+  }
+}
