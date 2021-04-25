@@ -26,7 +26,7 @@ window.addEventListener("load", () => setTimeout( function (event) {
   const preloader = document.querySelector("#pre");
   preloader.classList.add("finish-load");
   main();
-}, 0));
+}, 3000));
 
 const gridHeight = map1.length;
 const gridWidth = map1[0].length;
