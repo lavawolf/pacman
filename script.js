@@ -9,6 +9,7 @@ const gridHeight = 10
 const gridWidth = 20
 
 const game = document.querySelector('#game')
+const canvas = document.querySelector('canvas')
 
 
 class Cell {
@@ -61,6 +62,8 @@ class Cell {
 function main() {
   game.style.height = `${gridHeight * 40 + 20}px`
   game.style.width = `${gridWidth * 40 + 40}px`
+  canvas.style.height = game.style.height
+  canvas.style.width = game.style.width
   const grid = []
   for (let i = 0; i < gridWidth; i++) {
     grid.push(Array(gridHeight).fill(new Cell(0)))
