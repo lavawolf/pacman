@@ -87,7 +87,12 @@ canvas {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: opacity 0.5s ease-out;
+  transition: opacity 0.7s ease-out;
+}
+
+.finish-load {
+  opacity: 0;
+  pointer-events: none;
 }
 
 #title-preload {
@@ -122,11 +127,6 @@ canvas {
   transform: translate(4%, -60%);
   animation: ball-run 5s;
   animation-timing-function: linear;
-}
-
-.finish-load {
-  opacity: 0;
-  pointer-events: none;
 }
 
 @keyframes textzoom {
