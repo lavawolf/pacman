@@ -1,7 +1,7 @@
 'use strict';
 
 window.addEventListener("load", setTimeout( function (event) {
-  const preloader = document.querySelector(".pre-loader");
+  const preloader = document.querySelector("#pre");
   preloader.classList.add("finish-load");
 }, 4400));
 
