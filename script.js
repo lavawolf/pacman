@@ -33,7 +33,7 @@ const gridHeight = map.length;
 const gridWidth = map[0].length;
 const cellSize = 40;
 const pacSize = 26;
-const pacSpeed = 3;
+const pacSpeed = 4;
 
 const game = document.querySelector('#game');
 const canvas = document.querySelector('canvas');
@@ -59,11 +59,11 @@ const dirMap = {
 }
 
 let state = 0;
-let x = 275;
-let y = 25;
+let x = 60;
+let y = 60;
 let dir = 0;
-let x_grid = 0;
-let y_grid = 0;
+let x_grid = 1;
+let y_grid = 1;
 
 function renderCell(state, adj) {
   const cell = document.createElement('div');
@@ -72,7 +72,6 @@ function renderCell(state, adj) {
 
   switch (state) {
     case stateMap.blockState:
-      console.log(adj);
       cell.classList.add('cell_block');
       if (adj.left) cell.style.borderLeft = '1px solid blue';
       if (adj.right) cell.style.borderRight = '1px solid blue';
@@ -117,15 +116,15 @@ function main() {
   });
   
   const grid = [];
-  for (let x = 0; x < gridWidth; x++) {
+  for (let xc = 0; xc < gridWidth; xc++) {
     const col = [];
-    for (let y = 0; y < gridHeight; y++) {
+    for (let yc = 0; yc < gridHeight; yc++) {
       const adj = {};
-      if(x > 0 && map[y][x-1] > 0) adj.left = true;
-      if(x < gridWidth - 1 && map[y][x+1] > 0) adj.right = true;
-      if(y > 0 && map[y-1][x] > 0) adj.top = true;
-      if(y < gridHeight - 1 && map[y+1][x] > 0) adj.bottom = true;
-      col.push(renderCell(map[y][x], adj));
+      if(xc > 0 && map[yc][xc-1] > 0) adj.left = true;
+      if(xc < gridWidth - 1 && map[yc][xc+1] > 0) adj.right = true;
+      if(yc > 0 && map[yc-1][xc] > 0) adj.top = true;
+      if(yc < gridHeight - 1 && map[yc+1][xc] > 0) adj.bottom = true;
+      col.push(renderCell(map[yc][xc], adj));
     }
     grid.push(col);
   }
@@ -150,29 +149,46 @@ function renderGrid(grid) {
 function animatePac() {
   renderPac();
   state = (state + 1) % 20;
-  
+  // const pX = x;
+  // const pY = y;
+  console.log(x, y);
   switch (dir) {
     case 0:
       x += pacSpeed;
+      x_grid = Math.floor((x - cellSize / 2) / cellSize);
+      if (!map[y_grid][x_grid + 1]) x = (x_grid + 1/2) * cellSize;
+      x_grid = Math.floor((x - cellSize / 2) / cellSize);
       break;
     case 1:
       y -= pacSpeed;
+      y_grid = Math.floor((y - cellSize / 2) / cellSize);
+      if (!map[y_grid][x_grid]) y = (y_grid + 3/2) * cellSize;
+      y_grid = Math.floor((y - cellSize / 2) / cellSize);
       break;
     case 2:
       x -= pacSpeed;
+      x_grid = Math.floor((x - cellSize / 2) / cellSize);
+      if (!map[y_grid][x_grid]) x = (x_grid + 3/2) * cellSize;
+      x_grid = Math.floor((x - cellSize / 2) / cellSize);
       break;
     case 3:
       y += pacSpeed;
+      y_grid = Math.floor((y - cellSize / 2) / cellSize);
+      console.log(y_grid, x_grid);
+      if (!map[y_grid + 1][x_grid]) y = (y_grid + 1/2) * cellSize;
+      y_grid = Math.floor((y - cellSize / 2) / cellSize);
       break;
   }
-  x_grid = Math.floor((x - cellSize / 2) / cellSize);
-  y_grid = Math.floor((y - cellSize / 2) / cellSize);
-  // console.log(x);
-  if (x_grid < 0) x = cellSize / 2;
-  else if (x_grid >= gridWidth - 1) x = (gridWidth - 1/2) * cellSize;
+  // console.log(dir, x_grid, y_grid);
+  // x_grid = Math.floor((x - cellSize / 2) / cellSize);
+  // y_grid = Math.floor((y - cellSize / 2) / cellSize);
   
-  if (y_grid < 0) y = cellSize / 2;
-  else if (y_grid >= gridHeight - 1) y = (gridHeight - 1/2) * cellSize;
+  
+  // if (x_grid < 0) x = cellSize / 2;
+  // else if (x_grid >= gridWidth - 1) x = (gridWidth - 1/2) * cellSize;
+  
+  // if (y_grid < 0) y = cellSize / 2;
+  // else if (y_grid >= gridHeight - 1) y = (gridHeight - 1/2) * cellSize;
   requestAnimationFrame(animatePac);
 }
 
