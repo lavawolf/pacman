@@ -1,7 +1,7 @@
 'use strict';
 
 const map1 = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
@@ -19,17 +19,18 @@ const map1 = [
   [0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0],
   [0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0],
   [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ]
 
 window.addEventListener("load", () => setTimeout( function (event) {
   const preloader = document.querySelector("#pre");
   preloader.classList.add("finish-load");
   main();
-}, 3000));
+}, 0));
 
-const gridHeight = map1.length;
-const gridWidth = map1[0].length;
+const map = map1;
+const gridHeight = map.length;
+const gridWidth = map[0].length;
 const cellSize = 40;
 const pacSize = 26;
 const pacSpeed = 3;
@@ -40,9 +41,15 @@ const ctx = canvas.getContext('2d');
 
 const pac1 = new Image();
 pac1.src = './pacman_characters/pacman_closed.png';
-
 const pac2 = new Image();
 pac2.src = './pacman_characters/pacman_eating.png';
+
+const stateMap = {
+  blockState: 0,
+  noneState: 1,
+  pointState: 2,
+  powerState: 3,
+}
 
 const dirMap = {
   "ArrowLeft": 2,
@@ -58,53 +65,44 @@ let dir = 0;
 let x_grid = 0;
 let y_grid = 0;
 
-class Cell {
-  static blockState = 0;
-  static noneState = 1;
-  static pointState = 2;
-  static powerState = 3;
+function renderCell(state, adj) {
+  const cell = document.createElement('div');
+  cell.classList.add('cell');
   
-  #state;
 
-  constructor(state) {
-    this.#state = state;
-  }
+  switch (state) {
+    case stateMap.blockState:
+      console.log(adj);
+      cell.classList.add('cell_block');
+      if (adj.left) cell.style.borderLeft = '1px solid blue';
+      if (adj.right) cell.style.borderRight = '1px solid blue';
+      if (adj.top) cell.style.borderTop = '1px solid blue';
+      if (adj.bottom) cell.style.borderBottom = '1px solid blue';
+      break
 
-  get state() {
-    return this.#state;
-  }
+    case stateMap.pointState:
+      let childPoint = document.createElement('div');
+      childPoint.classList.add('point');
+      cell.appendChild(childPoint);
+      break
 
-  render() {
-    const cell = document.createElement('div')
-    cell.classList.add('cell')
-
-    switch (this.#state) {
-      
-      case Cell.blockState:
-        cell.classList.add('cell_block')
-        break
-
-      case Cell.pointState:
-        let childPoint = document.createElement('div')
-        childPoint.classList.add('point')
-        cell.appendChild(childPoint)
-        break
-
-      case Cell.powerState:
-        let child = document.createElement('div')
-        child.classList.add('power')
-        cell.appendChild(child)
-        break
+    case stateMap.powerState:
+      let child = document.createElement('div');
+      child.classList.add('power');
+      cell.appendChild(child);
+      break;
     }
-    return cell
-  }
+    return cell;
 }
 
 
+function eatCell(cell) {
+  cell.removeChild(cell.lastChild);
+}
 
 
 function main() {
-  console.log(map1);
+  console.log(map);
   const h = gridHeight * cellSize;
   const w = gridWidth * cellSize;
   game.style.height = `${h}px`;
@@ -119,29 +117,35 @@ function main() {
   });
   
   const grid = [];
-  for (let i = 0; i < gridWidth; i++) {
+  for (let x = 0; x < gridWidth; x++) {
     const col = [];
-    for (let j = 0; j < gridHeight; j++) {
-      col.push(new Cell(map1[j][i]));    
+    for (let y = 0; y < gridHeight; y++) {
+      const adj = {};
+      if(x > 0 && map[y][x-1] > 0) adj.left = true;
+      if(x < gridWidth - 1 && map[y][x+1] > 0) adj.right = true;
+      if(y > 0 && map[y-1][x] > 0) adj.top = true;
+      if(y < gridHeight - 1 && map[y+1][x] > 0) adj.bottom = true;
+      col.push(renderCell(map[y][x], adj));
     }
     grid.push(col);
   }
   renderGrid(grid);
-  readMap();
-
+  // eatCell(grid[1][2]);
   requestAnimationFrame(animatePac);
 }
+
 
 function renderGrid(grid) {
   for (let col of grid) {
     const gridCol = document.createElement('div');
     gridCol.classList.add('row');
     for (let cell of col) {
-      gridCol.appendChild(cell.render());
+      gridCol.appendChild(cell);
     }
     game.appendChild(gridCol);
   }
 }
+
 
 function animatePac() {
   renderPac();
@@ -187,7 +191,4 @@ function renderPac() {
   // ctx.restore();
 }
 
-function readMap() {
-  
-}
 
