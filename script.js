@@ -79,6 +79,7 @@ const dirMap = {
   "ArrowDown": 3,
 }
 
+const grid = [];
 let state = 0;
 let x = 60;
 let y = 60;
@@ -119,7 +120,8 @@ function renderCell(state, adj) {
 
 
 function eatCell(cell) {
-  cell.removeChild(cell.lastChild);
+  if(cell.children.length)
+    cell.removeChild(cell.lastChild);
 }
 
 
@@ -128,19 +130,23 @@ function turn() {
     dir = queryDir;
     queryTicks = 0;
   } else if (queryDir % 2 === 1 && Math.abs(x - (x_grid + 1/2) * cellSize) <= 4) {
-    x = (x_grid + 1/2) * cellSize;
-    dir = queryDir;
+    if(map[y_grid + queryDir - 2][x_grid]) {
+      x = (x_grid + 1/2) * cellSize;
+      dir = queryDir;
+    }
     queryTicks = 0;
   } else if(queryDir % 2 === 0 && Math.abs(y - (y_grid + 1/2) * cellSize) <= 4) {
-    y = (y_grid + 1/2) * cellSize;
-    dir = queryDir;
+    if(map[y_grid][x_grid + 1 - queryDir]){
+      y = (y_grid + 1/2) * cellSize;
+      dir = queryDir;
+    }
     queryTicks = 0;
   } else queryTicks--;
+  eatCell(grid[x_grid][y_grid])
 }
 
 
 function main() {
-  // console.log(map);
   const h = gridHeight * cellSize;
   const w = gridWidth * cellSize;
   game.style.height = `${h}px`;
@@ -155,7 +161,7 @@ function main() {
     queryTicks = 10;
   });
   
-  const grid = [];
+
   for (let xc = 0; xc < gridWidth; xc++) {
     const col = [];
     for (let yc = 0; yc < gridHeight; yc++) {
@@ -168,8 +174,7 @@ function main() {
     }
     grid.push(col);
   }
-  renderGrid(grid);
-  // eatCell(grid[1][2]);
+  renderGrid();
   requestAnimationFrame(animatePac);
 
   // renderGhost(map1);
@@ -187,7 +192,7 @@ function renderGhost() {
   }
 }
 
-function renderGrid(grid) {
+function renderGrid() {
   for (let col of grid) {
     const gridCol = document.createElement('div');
     gridCol.classList.add('row');
@@ -199,10 +204,10 @@ function renderGrid(grid) {
 }
 
 function animatePac() {
+  
   renderPac();
   renderGhost();
   state = (state + 1) % 20;
-  // console.log(x, y, dir);
   if (queryTicks > 0) turn();
   switch (dir) {
     case 0:
@@ -230,6 +235,11 @@ function animatePac() {
       y_grid = Math.floor((y - cellSize / 2) / cellSize);
       break;
   }
+  if ((x - cellSize / 2) % cellSize === 0 && (y - cellSize / 2) % cellSize === 0) eatCell(grid[x_grid][y_grid]);
+  
+  // if(dir === 0 || dir === 3) eatCell(grid[x_grid][y_grid]);
+  // else if(dir === 2) eatCell(grid[x_grid + 1][y_grid]);
+  // else eatCell(grid[x_grid][y_grid + 1]);
   requestAnimationFrame(animatePac);
 }
 
