@@ -2,23 +2,23 @@
 
 const map1 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
+  [0, 2, 2, 3, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 3, 2, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
   [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0],
   [0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0],
-  [0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0],
+  [0, 0, 2, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 2, 0, 0],
   [0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0],
-  [0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 1, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0],
+  [0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 1, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0],
   [0, 2, 2, 2, 2, 2, 0, 2, 0, 1, 1, 1, 0, 2, 0, 2, 2, 2, 2, 2, 0],
   [0, 2, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 2, 0],
-  [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
-  [0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 0],
+  [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 2, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
+  [0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 0],
   [0, 0, 0, 2, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 2, 0, 2, 0, 0, 0],
   [0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0],
   [0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0],
-  [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
+  [0, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ]
 
@@ -33,6 +33,9 @@ const gridHeight = map.length;
 const gridWidth = map[0].length;
 const cellSize = 40;
 const pacSize = 26;
+
+const ghostSize = 26;
+const line_margin = 7;
 const pacSpeed = 4;
 
 const game = document.querySelector('#game');
@@ -43,6 +46,24 @@ const pac1 = new Image();
 pac1.src = './pacman_characters/pacman_closed.png';
 const pac2 = new Image();
 pac2.src = './pacman_characters/pacman_eating.png';
+
+var ghosts = [];
+const ghost_green = new Image();
+ghost_green.src = './pacman_characters/green_ghost.png';
+const ghost_red = new Image();
+ghost_red.src = './pacman_characters/red_ghost.png';
+const ghost_orange = new Image();
+ghost_orange.src = './pacman_characters/orange_ghost.png';
+const ghost_pink = new Image();
+ghost_pink.src = './pacman_characters/pink_ghost.png';
+const ghost_scared = new Image();
+ghost_scared.src = './pacman_characters/scared_ghost.png';
+ghosts.push(ghost_scared);
+ghosts.push(ghost_green);
+ghosts.push(ghost_orange);
+ghosts.push(ghost_red);
+ghosts.push(ghost_pink);
+
 
 const stateMap = {
   blockState: 0,
@@ -150,8 +171,21 @@ function main() {
   renderGrid(grid);
   // eatCell(grid[1][2]);
   requestAnimationFrame(animatePac);
+
+  // renderGhost(map1);
 }
 
+function renderGhost() {
+  let i = 1;
+  for (let [col_ind, col_val] of map1.entries()) {
+    for (let [cell_ind, cell_val] of col_val.entries()) {
+      if ( cell_val === stateMap.noneState) {
+        ctx.drawImage(ghosts[i], cell_ind * cellSize + (line_margin), col_ind * cellSize + (line_margin), ghostSize, ghostSize);
+        i += 1;
+      }
+    }
+  }
+}
 
 function renderGrid(grid) {
   for (let col of grid) {
@@ -164,9 +198,9 @@ function renderGrid(grid) {
   }
 }
 
-
 function animatePac() {
   renderPac();
+  renderGhost();
   state = (state + 1) % 20;
   // console.log(x, y, dir);
   if (queryTicks > 0) turn();
