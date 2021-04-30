@@ -130,15 +130,12 @@ function turn() {
     dir = queryDir;
     queryTicks = 0;
   } else if (queryDir % 2 === 1 && Math.abs(x - (x_grid + 1/2) * cellSize) <= 4) {
-    console.log(map[y_grid + queryDir - 2][x_grid]);
     if(map[y_grid + queryDir - 2][x_grid]) {
       x = (x_grid + 1/2) * cellSize;
       dir = queryDir;
     }
     queryTicks = 0;
   } else if(queryDir % 2 === 0 && Math.abs(y - (y_grid + 1/2) * cellSize) <= 4) {
-    console.log(y_grid, x_grid + 1 - queryDir);
-    console.log(map[y_grid][x_grid + 1 - queryDir]);
     if(map[y_grid][x_grid + 1 - queryDir]){
       y = (y_grid + 1/2) * cellSize;
       dir = queryDir;
@@ -150,7 +147,6 @@ function turn() {
 
 
 function main() {
-  console.log(map);
   const h = gridHeight * cellSize;
   const w = gridWidth * cellSize;
   game.style.height = `${h}px`;
@@ -179,7 +175,6 @@ function main() {
     grid.push(col);
   }
   renderGrid();
-  // console.log(map[1][3])
   requestAnimationFrame(animatePac);
 
   // renderGhost(map1);
@@ -213,7 +208,6 @@ function animatePac() {
   renderPac();
   renderGhost();
   state = (state + 1) % 20;
-  // console.log(x, y, dir);
   if (queryTicks > 0) turn();
   switch (dir) {
     case 0:
@@ -242,7 +236,6 @@ function animatePac() {
       break;
   }
   if ((x - cellSize / 2) % cellSize === 0 && (y - cellSize / 2) % cellSize === 0) eatCell(grid[x_grid][y_grid]);
-  // console.log(grid[1][1]);
   
   // if(dir === 0 || dir === 3) eatCell(grid[x_grid][y_grid]);
   // else if(dir === 2) eatCell(grid[x_grid + 1][y_grid]);
