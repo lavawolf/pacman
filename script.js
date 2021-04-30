@@ -64,6 +64,8 @@ let y = 60;
 let dir = 0;
 let x_grid = 1;
 let y_grid = 1;
+let queryTicks = 0;
+let queryDir = 0;
 
 function renderCell(state, adj) {
   const cell = document.createElement('div');
@@ -100,8 +102,24 @@ function eatCell(cell) {
 }
 
 
+function turn() {
+  if ((dir + queryDir) % 2 == 0) {
+    dir = queryDir;
+    queryTicks = 0;
+  } else if (queryDir % 2 === 1 && Math.abs(x - (x_grid + 1/2) * cellSize) <= 4) {
+    x = (x_grid + 1/2) * cellSize;
+    dir = queryDir;
+    queryTicks = 0;
+  } else if(queryDir % 2 === 0 && Math.abs(y - (y_grid + 1/2) * cellSize) <= 4) {
+    y = (y_grid + 1/2) * cellSize;
+    dir = queryDir;
+    queryTicks = 0;
+  } else queryTicks--;
+}
+
+
 function main() {
-  console.log(map);
+  // console.log(map);
   const h = gridHeight * cellSize;
   const w = gridWidth * cellSize;
   game.style.height = `${h}px`;
@@ -112,7 +130,8 @@ function main() {
   ctx.canvas.width = w;
 
   window.addEventListener('keydown', (event) => {
-    dir = dirMap[event.key];
+    queryDir = dirMap[event.key];
+    queryTicks = 10;
   });
   
   const grid = [];
@@ -149,9 +168,8 @@ function renderGrid(grid) {
 function animatePac() {
   renderPac();
   state = (state + 1) % 20;
-  // const pX = x;
-  // const pY = y;
-  console.log(x, y);
+  // console.log(x, y, dir);
+  if (queryTicks > 0) turn();
   switch (dir) {
     case 0:
       x += pacSpeed;
@@ -174,21 +192,10 @@ function animatePac() {
     case 3:
       y += pacSpeed;
       y_grid = Math.floor((y - cellSize / 2) / cellSize);
-      console.log(y_grid, x_grid);
       if (!map[y_grid + 1][x_grid]) y = (y_grid + 1/2) * cellSize;
       y_grid = Math.floor((y - cellSize / 2) / cellSize);
       break;
   }
-  // console.log(dir, x_grid, y_grid);
-  // x_grid = Math.floor((x - cellSize / 2) / cellSize);
-  // y_grid = Math.floor((y - cellSize / 2) / cellSize);
-  
-  
-  // if (x_grid < 0) x = cellSize / 2;
-  // else if (x_grid >= gridWidth - 1) x = (gridWidth - 1/2) * cellSize;
-  
-  // if (y_grid < 0) y = cellSize / 2;
-  // else if (y_grid >= gridHeight - 1) y = (gridHeight - 1/2) * cellSize;
   requestAnimationFrame(animatePac);
 }
 
