@@ -28,9 +28,10 @@ const gridWidth = map[0].length;
 const cellSize = 40;
 const pacSize = 26;
 
-const ghostSize = 26;
+const ghostSize = 40;
 const line_margin = 7;
 const pacSpeed = 3;
+const ghostSpeed = 3;
 
 const game = document.querySelector('#game');
 const canvas = document.querySelector('canvas');
@@ -45,21 +46,21 @@ pac2.src = './pacman_characters/pacman_eating.png';
 
 
 var ghosts = [];
-const ghost_green = new Image();
-ghost_green.src = './pacman_characters/green_ghost.png';
 const ghost_red = new Image();
 ghost_red.src = './pacman_characters/red_ghost.png';
 const ghost_orange = new Image();
 ghost_orange.src = './pacman_characters/orange_ghost.png';
 const ghost_pink = new Image();
 ghost_pink.src = './pacman_characters/pink_ghost.png';
+const ghost_blue = new Image();
+ghost_blue.src = './pacman_characters/blue_ghost.png';
 const ghost_scared = new Image();
 ghost_scared.src = './pacman_characters/scared_ghost.png';
 ghosts.push(ghost_scared);
-ghosts.push(ghost_green);
-ghosts.push(ghost_orange);
 ghosts.push(ghost_red);
 ghosts.push(ghost_pink);
+ghosts.push(ghost_blue);
+ghosts.push(ghost_orange);
 
 
 const stateMap = {
@@ -82,6 +83,7 @@ const scoreMap = {
 }
 
 const grid = [];
+
 let state = 0;
 let x = 60;
 let y = 60;
@@ -91,6 +93,16 @@ let y_grid = 1;
 let queryTicks = 0;
 let queryDir = 0;
 let score = -10;
+
+// initial ghost coordinates red, oink, blue, orange
+let x_r = 400;
+let y_r = 360;
+let x_p = 400;
+let y_p = 400;
+let x_b = 440;
+let y_b = 400;
+let x_o = 360;
+let y_o = 400;
 
 
 function renderCell(state, adj) {
@@ -193,16 +205,27 @@ function main() {
 }
 
 
+function renderRed() {
+  ctx.drawImage(ghosts[1], x_r , y_r, ghostSize, ghostSize);
+}
+
+function renderPink() {
+  ctx.drawImage(ghosts[2], x_p , y_p, ghostSize, ghostSize);
+}
+
+function renderBlue() {
+  ctx.drawImage(ghosts[3], x_b , y_b, ghostSize, ghostSize);
+}
+
+function renderOrange() {
+  ctx.drawImage(ghosts[4], x_o , y_o, ghostSize, ghostSize);
+}
+
 function renderGhost() {
-  let i = 1;
-  for (let [col_ind, col_val] of map1.entries()) {
-    for (let [cell_ind, cell_val] of col_val.entries()) {
-      if ( cell_val === stateMap.noneState) {
-        ctx.drawImage(ghosts[i], cell_ind * cellSize + (line_margin), col_ind * cellSize + (line_margin), ghostSize, ghostSize);
-        i += 1;
-      }
-    }
-  }
+  renderRed();
+  renderPink();
+  renderBlue();
+  renderOrange();
 }
 
 
@@ -280,7 +303,7 @@ function init() {
     const preloader = document.querySelector("#pre");
     preloader.classList.add("finish-load");
     main();
-  }, 3000));
+  }, 0));
 }
 
 init();
