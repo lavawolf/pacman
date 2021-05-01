@@ -22,12 +22,6 @@ const map1 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ]
 
-window.addEventListener("load", () => setTimeout( function (event) {
-  const preloader = document.querySelector("#pre");
-  preloader.classList.add("finish-load");
-  main();
-}, 0));
-
 const map = map1;
 const gridHeight = map.length;
 const gridWidth = map[0].length;
@@ -36,16 +30,19 @@ const pacSize = 26;
 
 const ghostSize = 26;
 const line_margin = 7;
-const pacSpeed = 4;
+const pacSpeed = 3;
 
 const game = document.querySelector('#game');
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
+const scoreboard = document.querySelector('#scoreboard');
+const scoreDisplay = document.querySelector('#score');
 
 const pac1 = new Image();
 pac1.src = './pacman_characters/pacman_closed.png';
 const pac2 = new Image();
 pac2.src = './pacman_characters/pacman_eating.png';
+
 
 var ghosts = [];
 const ghost_green = new Image();
@@ -79,15 +76,22 @@ const dirMap = {
   "ArrowDown": 3,
 }
 
+const scoreMap = {
+  2: 10,
+  3: 50,
+}
+
 const grid = [];
 let state = 0;
 let x = 60;
 let y = 60;
-let dir = 0;
+let dir = 4;
 let x_grid = 1;
 let y_grid = 1;
 let queryTicks = 0;
 let queryDir = 0;
+let score = -10;
+
 
 function renderCell(state, adj) {
   const cell = document.createElement('div');
@@ -119,9 +123,14 @@ function renderCell(state, adj) {
 }
 
 
-function eatCell(cell) {
-  if(cell.children.length)
+function eatCell() {
+  const cell = grid[x_grid][y_grid];
+  if(cell.children.length) {
     cell.removeChild(cell.lastChild);
+    score += scoreMap[map[y_grid][x_grid]];
+  }
+  scoreDisplay.textContent = score;
+  // console.log(score);
 }
 
 
@@ -142,7 +151,7 @@ function turn() {
     }
     queryTicks = 0;
   } else queryTicks--;
-  eatCell(grid[x_grid][y_grid])
+  eatCell();
 }
 
 
@@ -155,10 +164,13 @@ function main() {
   canvas.style.width = game.style.width;
   ctx.canvas.height = h;
   ctx.canvas.width = w;
+  scoreboard.style.height = game.style.height;
+  game.style.border = '2px solid blue';
+
 
   window.addEventListener('keydown', (event) => {
     queryDir = dirMap[event.key];
-    queryTicks = 10;
+    queryTicks = Math.floor(cellSize / pacSpeed);
   });
   
 
@@ -180,6 +192,7 @@ function main() {
   // renderGhost(map1);
 }
 
+
 function renderGhost() {
   let i = 1;
   for (let [col_ind, col_val] of map1.entries()) {
@@ -192,6 +205,7 @@ function renderGhost() {
   }
 }
 
+
 function renderGrid() {
   for (let col of grid) {
     const gridCol = document.createElement('div');
@@ -202,6 +216,7 @@ function renderGrid() {
     game.appendChild(gridCol);
   }
 }
+
 
 function animatePac() {
   
@@ -235,13 +250,14 @@ function animatePac() {
       y_grid = Math.floor((y - cellSize / 2) / cellSize);
       break;
   }
-  if ((x - cellSize / 2) % cellSize === 0 && (y - cellSize / 2) % cellSize === 0) eatCell(grid[x_grid][y_grid]);
+  if ((x - cellSize / 2) % cellSize <= pacSpeed && (y - cellSize / 2) % cellSize <= pacSpeed) eatCell(grid[x_grid][y_grid]);
   
   // if(dir === 0 || dir === 3) eatCell(grid[x_grid][y_grid]);
   // else if(dir === 2) eatCell(grid[x_grid + 1][y_grid]);
   // else eatCell(grid[x_grid][y_grid + 1]);
   requestAnimationFrame(animatePac);
 }
+
 
 function renderPac() {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -258,4 +274,14 @@ function renderPac() {
   // ctx.restore();
 }
 
+
+function init() {
+  window.addEventListener("load", () => setTimeout( function (event) {
+    const preloader = document.querySelector("#pre");
+    preloader.classList.add("finish-load");
+    main();
+  }, 3000));
+}
+
+init();
 
