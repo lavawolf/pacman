@@ -48,22 +48,28 @@ const pac2 = new Image();
 pac2.src = './pacman_characters/pacman_eating.png';
 
 var ghosts = [];
-const ghost_green = new Image();
-ghost_green.src = './pacman_characters/green_ghost.png';
 const ghost_red = new Image();
 ghost_red.src = './pacman_characters/red_ghost.png';
 const ghost_orange = new Image();
 ghost_orange.src = './pacman_characters/orange_ghost.png';
 const ghost_pink = new Image();
 ghost_pink.src = './pacman_characters/pink_ghost.png';
+const ghost_blue = new Image();
+ghost_blue.src = './pacman_characters/blueghost.png';
 const ghost_scared = new Image();
 ghost_scared.src = './pacman_characters/scared_ghost.png';
 ghosts.push(ghost_scared);
-ghosts.push(ghost_green);
-ghosts.push(ghost_orange);
 ghosts.push(ghost_red);
 ghosts.push(ghost_pink);
+ghosts.push(ghost_blue);
+ghosts.push(ghost_orange);
 
+
+let (x_r, y_r) = (420, 380);
+let (x_p, y_p) = (420, 420);
+let (x_b, y_b) = (460, 420);
+let (x_o, y_o) = (380, 420);
+var ghost_pos = {red: (x_r, y_r), orange: (x_o, y_o), blue: (x_b, y_b), pink: (x_p, y_p)};
 
 const stateMap = {
   blockState: 0,
@@ -176,16 +182,13 @@ function main() {
 }
 
 function renderGhost() {
-  let i = 1;
-  for (let [col_ind, col_val] of map1.entries()) {
-    for (let [cell_ind, cell_val] of col_val.entries()) {
-      if ( cell_val === stateMap.noneState) {
-        ctx.drawImage(ghosts[i], cell_ind * cellSize + (line_margin), col_ind * cellSize + (line_margin), ghostSize, ghostSize);
-        i += 1;
-      }
-    }
-  }
+  renderRed();
+  renderPink();
+  renderBlue();
+  renderOrange();
 }
+
+
 
 function renderGrid(grid) {
   for (let col of grid) {
@@ -200,7 +203,7 @@ function renderGrid(grid) {
 
 function animatePac() {
   renderPac();
-  renderGhost();
+  // renderGhost();
   state = (state + 1) % 20;
   // console.log(x, y, dir);
   if (queryTicks > 0) turn();
