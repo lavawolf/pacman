@@ -14,6 +14,13 @@ body {
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'emulogic';
+  src: url('fonts/emulogic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 #title {
   font-family: 'pacfontregular';
   font-size: 50px;
@@ -22,7 +29,17 @@ body {
 }
 
 #game {
-  border: 2px solid blue;
+  /* border: 2px solid blue; */
+  overflow: hidden;
+  align-items: center;
+  display: flex;
+  margin: auto;
+  justify-content: center;
+  position: fixed;
+}
+
+#container {
+  /* border: 2px solid blue; */
   overflow: hidden;
   align-items: center;
   display: flex;
@@ -39,9 +56,11 @@ body {
   border: 1px solid black;
 }
 
-.cell_block {
-  /* border: 1px solid blue !important;  */
-}
+/* #score {
+  color: white;
+  margin: 50px;
+  font-family: 'emulogic';
+} */
 
 .point {
   width: 6px;
@@ -63,14 +82,18 @@ body {
   margin: 0;
 }
 
+#scoreboard * {
+  margin: 50px;
+}
+
 #scoreboard {
-  padding: 20px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  border: 2px solid green;
-  /* overflow: auto; */
-  /* align-items: center; */
-  display: flex;
+  /* border: 2px solid green; */
+  width: 100%;
+  color: white;
+  /* margin: 50px; */
+  font-family: 'emulogic';
+  /* position: relative; */
+  /* top: -200%; */
   /* justify-content: center; */
 }
 
