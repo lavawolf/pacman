@@ -22,6 +22,10 @@ const map1 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ]
 
+class Pacman {
+  
+}
+
 const map = map1;
 const gridHeight = map.length;
 const gridWidth = map[0].length;
