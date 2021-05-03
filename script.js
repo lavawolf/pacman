@@ -30,7 +30,7 @@ const map = map1;
 const gridHeight = map.length;
 const gridWidth = map[0].length;
 const cellSize = 40;
-const pacSize = 20;
+const pacSize = 26;
 
 const ghostSize = 40;
 const line_margin = 7;
@@ -134,10 +134,10 @@ function renderCell(state, adj) {
   switch (state) {
     case stateMap.blockState:
       cell.classList.add('cell_block');
-      if (adj.left) cell.style.borderLeft = '1px solid blue';
-      if (adj.right) cell.style.borderRight = '1px solid blue';
-      if (adj.top) cell.style.borderTop = '1px solid blue';
-      if (adj.bottom) cell.style.borderBottom = '1px solid blue';
+      if (adj.left) cell.style.borderLeft = '2px solid blue';
+      if (adj.right) cell.style.borderRight = '2px solid blue';
+      if (adj.top) cell.style.borderTop = '2px solid blue';
+      if (adj.bottom) cell.style.borderBottom = '2px solid blue';
       break
 
     case stateMap.pointState:
@@ -345,7 +345,7 @@ function renderGrid() {
 
 
 function animatePac() {
-  
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   renderPac();
   renderGhost();
   state = (state + 1) % 20;
@@ -386,7 +386,6 @@ function animatePac() {
 
 
 function renderPac() {
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   // ctx.save();
   ctx.translate(x, y);
   ctx.rotate(-Math.PI * dir / 2);
