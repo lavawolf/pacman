@@ -1,9 +1,13 @@
 :root {
   --preload-time: 3s;
+  --scale: 0.5;
 }
 
 body {
   background-color: black;
+  zoom: var(--scale); 
+  -moz-transform: scale(var(--scale)); 
+  -moz-transform-origin: 0 0;
 }
 
 @font-face {
@@ -48,12 +52,12 @@ body {
 }
 
 .cell {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   background-color: black;
   margin: 0px;
   padding: 0px;
-  border: 1px solid black;
+  border: 2px solid black;
 }
 
 /* #score {
