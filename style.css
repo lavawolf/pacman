@@ -1,9 +1,13 @@
 :root {
   --preload-time: 3s;
+  --scale: 0.5;
 }
 
 body {
   background-color: black;
+  zoom: var(--scale); 
+  -moz-transform: scale(var(--scale)); 
+  -moz-transform-origin: 0 0;
 }
 
 @font-face {
