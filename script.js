@@ -2,13 +2,13 @@
 
 const map1 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 1, 2, 3, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 3, 2, 2, 0],
+  [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
-  [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
+  [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 3, 0],
   [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0],
   [0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0],
-  [0, 0, 2, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 2, 0, 0],
+  [0, 0, 3, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 2, 0, 0],
   [0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 1, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0],
   [0, 2, 2, 2, 2, 2, 0, 2, 0, 1, 1, 1, 0, 2, 0, 2, 2, 2, 2, 2, 0],
@@ -16,9 +16,9 @@ const map1 = [
   [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 2, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
   [0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 0],
   [0, 0, 0, 2, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 2, 0, 2, 0, 0, 0],
-  [0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0],
+  [0, 2, 3, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0],
   [0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0],
-  [0, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 0],
+  [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ]
 
@@ -61,6 +61,7 @@ class Ghost{
     this.image = image;
     this.direction = NaN;
     this.directionRev = NaN;
+    
   }
 }
 
@@ -84,7 +85,6 @@ const ghosts = [
   new Ghost('pink', [420, 420], 3, ghost_pink), 
   new Ghost('blue', [460, 420], 2, ghost_blue), 
   new Ghost('orange', [380, 420], 3, ghost_orange) ];
-
 
 // defines the state of each cell
 const stateMap = {
@@ -119,16 +119,8 @@ let queryTicks = 0;
 let queryDir = 0;
 let totalPoints = 0;
 
-// initial ghost coordinates red, oink, blue, orange
-let x_r = 400;
-let y_r = 360;
-let x_p = 400;
-let y_p = 400;
-let x_b = 440;
-let y_b = 400;
-let x_o = 360;
-let y_o = 400;
 let score = 0;
+let lives = 3;
 
 
 function renderCell(state, adj) {
@@ -171,7 +163,6 @@ function eatCell() {
     if(totalPoints === 0) restart();
   }
   scoreDisplay.textContent = score;
-  // console.log(score);
 }
 
 
@@ -208,7 +199,7 @@ function main() {
   ctx.canvas.width = w;
   scoreboard.style.height = game.style.height;
   game.style.border = '2px solid blue';
-
+  // livesDisplay.style.height = game.style.height;
 
   window.addEventListener('keydown', (event) => {
     event.preventDefault();
@@ -250,16 +241,60 @@ function getPossible(x, y) {
   return allowed;
 }
 
- let a = 0;
-function renderGhost() {
 
-  // drawing the ghosts
-  ghosts.forEach(ghost => {
-    ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
-  })
+function NextMove(ghost) {
 
-  // moving the ghosts
+  switch (ghost.direction) {
+    case 'left': 
+      ghost.currentPosition_x -= ghost.speed;
+      break;
+    case 'right':  
+      ghost.currentPosition_x += ghost.speed;
+      break;
+    case 'up': 
+      ghost.currentPosition_y -= ghost.speed;
+      break;
+    case 'down': 
+      ghost.currentPosition_y += ghost.speed;
+      break;
+  }
+}
+
+
+// function to decrease life of pacman or call the end of game
+function IsEaten(ghost) {
+
+  // checks if the ghost is near the pacman
+  if (JSON.stringify(ghost.currentPosition_x) >= x - 5 && JSON.stringify(ghost.currentPosition_x) <= x + 5 &&
+      JSON.stringify(ghost.currentPosition_y) >= y - 5 && JSON.stringify(ghost.currentPosition_y) <= y + 5){
+    
+    lives--;
+
+    //reinitialize ghosts and pacman positions
+    ghosts.forEach( ghostNew => {
+      ghostNew.currentPosition_x = ghostNew.startPosition_x;
+      ghostNew.currentPosition_y = ghostNew.startPosition_y;
+    } )
+    PacReset();
+
+    return true;
+  }
+  return false;
+}
+
+
+// moving the ghosts
+function MoveGhosts() {
+
   ghosts.forEach(ghost => {
+
+    // checks if pacman has eaten ghost
+    if (IsEaten(ghost)) return;
+
+    // Orange_ghost moves only after 100 points are scored
+    if (ghost.className == 'orange') {
+      if (score < 100) return;
+    }
 
     // finds the cell index of the ghost (x_pos, y_pos)
     let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
@@ -281,7 +316,7 @@ function renderGhost() {
           ghost.direction = 'up';
           ghost.directionRev = dirRev['up'];
           break;
-        case 'blue' :
+        case 'blue':
           ghost.direction = 'left';
           ghost.directionRev = dirRev['left'];
           break;
@@ -291,60 +326,41 @@ function renderGhost() {
           break;
       }
     }
-    
+
     // condition to check if the ghost is near the center of the cell or not
-    if ( 
-      ( 
-      ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x % cellSize) && (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) ) && 
-      ( ((cellSize / 2) - 1) <= (ghost.currentPosition_y % cellSize) && (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) + 1) )
-      )) {
+    if ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x % cellSize) && (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) && 
+       ((cellSize / 2) - 1) <= (ghost.currentPosition_y % cellSize) && (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) + 1) ) {
       
       // resets ghost to center of the cell
       ghost.currentPosition_x = (x_pos * cellSize) + (cellSize / 2);
       ghost.currentPosition_y = (y_pos * cellSize) + (cellSize / 2);
 
-      //selects a random move and updates the direction of the ghost if it is at the end of line
+      // removes reverse direction to avoid ghost going back
       if ( moves.hasOwnProperty(ghost.directionRev) ) delete moves[ghost.directionRev];
 
+      //selects a random move and updates the direction of the ghost if it is at the end of line
       ghost.direction = Object.keys(moves)[Math.floor(Math.random() * Object.keys(moves).length)]; 
       ghost.directionRev = dirRev[ghost.direction];
 
-      switch (ghost.direction) {
-        case 'left': 
-          ghost.currentPosition_x -= ghost.speed;
-          break;
-        case 'right':  
-          ghost.currentPosition_x += ghost.speed;
-          break;
-        case 'up': 
-          ghost.currentPosition_y -= ghost.speed;
-          break;
-        case 'down': 
-          ghost.currentPosition_y += ghost.speed;
-          break;
-      }
+      // moves the ghost in the respective direction
+      NextMove(ghost);
     }
 
-    // if ghost is not near the center, then in keeps moving in the direction it is already moving
-    else {
-      switch (ghost.direction) {
-        case 'left': 
-          ghost.currentPosition_x -= ghost.speed;
-          break;
-        case 'right':  
-          ghost.currentPosition_x += ghost.speed;
-          break;
-        case 'up': 
-          ghost.currentPosition_y -= ghost.speed;
-          break;
-        case 'down': 
-          ghost.currentPosition_y += ghost.speed;
-          break;
-      }
-    }
+    // if ghost is not near the center, then it keeps moving in the same direction
+    else NextMove(ghost);
 
   } )
 
+}
+
+
+function renderGhost() {
+  // drawing the ghosts
+  ghosts.forEach(ghost => {
+    ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
+  })
+
+  MoveGhosts();
 }
 
 
@@ -362,8 +378,8 @@ function renderGrid() {
 
 function animatePac() {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  renderPac();
   renderGhost();
+  renderPac();
   state = (state + 1) % 20;
   if (queryTicks > 0) turn();
   switch (dir) {
@@ -392,12 +408,17 @@ function animatePac() {
       y_grid = Math.floor((y - cellSize / 2) / cellSize);
       break;
   }
-  if ((x - cellSize / 2) % cellSize <= pacSpeed && (y - cellSize / 2) % cellSize <= pacSpeed) eatCell(grid[x_grid][y_grid]);
+  if ((x - cellSize / 2) % cellSize <= pacSpeed && (y - cellSize / 2) % cellSize <= pacSpeed) {
+    eatCell(grid[x_grid][y_grid]);
+  }
   
   // if(dir === 0 || dir === 3) eatCell(grid[x_grid][y_grid]);
   // else if(dir === 2) eatCell(grid[x_grid + 1][y_grid]);
   // else eatCell(grid[x_grid][y_grid + 1]);
-  requestAnimationFrame(animatePac);
+  if (lives != 0) {
+    requestAnimationFrame(animatePac);
+    // GameEnd();
+  }
 }
 
 
@@ -415,6 +436,22 @@ function renderPac() {
   // ctx.restore();
 }
 
+
+function GameEnd() {
+  return;
+}
+
+
+function PacReset() {
+  state = 0;
+  x = 60;
+  y = 60;
+  dir = 4;
+  x_grid = 1;
+  y_grid = 1;
+  queryTicks = 0;
+  queryDir = 0;
+}
 
 function restart() {
   for(let x = 0; x < grid.length; x++) {
@@ -434,15 +471,13 @@ function restart() {
       }
     }
   }
-  state = 0;
-  x = 60;
-  y = 60;
-  dir = 4;
-  x_grid = 1;
-  y_grid = 1;
-  queryTicks = 0;
-  queryDir = 0;
-  
+  ghosts.forEach( ghostNew => {
+    ghostNew.currentPosition_x = ghostNew.startPosition_x;
+    ghostNew.currentPosition_y = ghostNew.startPosition_y;
+  } )
+  lives = 3;
+  score = 0;
+  PacReset();
 }
 
 function init() {
