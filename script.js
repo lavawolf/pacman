@@ -268,33 +268,29 @@ function renderGhost() {
     let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
     let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
 
-    // if (a<5) {
-    //   console.log([ghost.currentPosition_x, ghost.currentPosition_y]);
-    //   a++;
-    // }  
-    // if (ghost.startPosition == [ghost.currentPosition_x, ghost.currentPosition_y]){
-    //   switch (ghost.Name) {
-    //     case 'red':
-    //       ghost.direction = 'up';
-    //       break;
-    //     case 'pink':
-    //       ghost.direction = 'up';
-    //       break;
-    //     case 'blue' :
-    //       ghost.direction = 'left';
-    //       break;
-    //     case 'orange':
-    //       ghost.direction = 'right';
-    //       break;
-    //   }
-    // }
+    if (ghost.startPosition == [ghost.currentPosition_x, ghost.currentPosition_y]){
+      switch (ghost.Name) {
+        case 'red':
+          ghost.direction = 'up';
+          break;
+        case 'pink':
+          ghost.direction = 'up';
+          break;
+        case 'blue' :
+          ghost.direction = 'left';
+          break;
+        case 'orange':
+          ghost.direction = 'right';
+          break;
+      }
+    }
     // condition to check if the ghost is near the center of the cell or not
 
     console.log(ghost.currentPosition_x % cellSize, ghost.currentPosition_y % cellSize);
 
     if (
-      ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) ) && 
-      ( ((cellSize / 2) - 1) <= (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) + 1) )
+      ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x % cellSize) && (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) ) && 
+      ( ((cellSize / 2) - 1) <= (ghost.currentPosition_y % cellSize) && (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) + 1) )
       ) {
       
       // console.log(ghost.currentPosition_x % cellSize);  
