@@ -108,7 +108,6 @@ let y_o = 400;
 function renderCell(state, adj) {
   const cell = document.createElement('div');
   cell.classList.add('cell');
-  
 
   switch (state) {
     case stateMap.blockState:
@@ -301,4 +300,3 @@ function init() {
 }
 
 init();
-
