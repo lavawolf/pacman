@@ -2,7 +2,7 @@
 
 const map1 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 2, 2, 3, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 3, 2, 2, 0],
+  [0, 1, 2, 3, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 3, 2, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
   [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
@@ -22,6 +22,10 @@ const map1 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ]
 
+class Pacman {
+  
+}
+
 const map = map1;
 const gridHeight = map.length;
 const gridWidth = map[0].length;
@@ -31,7 +35,7 @@ const pacSize = 20;
 const ghostSize = 40;
 const line_margin = 7;
 const pacSpeed = 3;
-const ghostSpeed = 3;
+const ghostSpeed = 2;
 
 const root = document.documentElement;
 const game = document.querySelector('#game');
@@ -45,8 +49,20 @@ pac1.src = './pacman_characters/pacman_closed.png';
 const pac2 = new Image();
 pac2.src = './pacman_characters/pacman_eating.png';
 
+// initializes the ghost object
+class Ghost{
+  constructor(Name, start, speed, image) {
+    this.className = Name;
+    this.startPosition = start;
+    this.currentPosition_x = start[0];
+    this.currentPosition_y = start[1];
+    this.speed = speed;
+    this.image = image;
+    this.direction = NaN;
+  }
+}
 
-var ghosts = [];
+// Ghost images
 const ghost_red = new Image();
 ghost_red.src = './pacman_characters/red_ghost.png';
 const ghost_orange = new Image();
@@ -57,13 +73,16 @@ const ghost_blue = new Image();
 ghost_blue.src = './pacman_characters/blue_ghost.png';
 const ghost_scared = new Image();
 ghost_scared.src = './pacman_characters/scared_ghost.png';
-ghosts.push(ghost_scared);
-ghosts.push(ghost_red);
-ghosts.push(ghost_pink);
-ghosts.push(ghost_blue);
-ghosts.push(ghost_orange);
+
+// initialising the ghosts with name, initial coordinates, speed, and image src
+const ghosts = [
+  new Ghost('red', [420, 380], 2.5, ghost_red), 
+  new Ghost('pink', [420, 420], 3, ghost_pink), 
+  new Ghost('blue', [460, 420], 2.5, ghost_blue), 
+  new Ghost('orange', [380, 420], 3, ghost_orange) ];
 
 
+// defines the state of each cell
 const stateMap = {
   blockState: 0,
   noneState: 1,
@@ -71,6 +90,7 @@ const stateMap = {
   powerState: 3,
 }
 
+// defines the input key by the user
 const dirMap = {
   "ArrowLeft": 2,
   "ArrowRight": 0,
@@ -93,7 +113,6 @@ let x_grid = 1;
 let y_grid = 1;
 let queryTicks = 0;
 let queryDir = 0;
-let score = -10;
 let totalPoints = 0;
 
 // initial ghost coordinates red, oink, blue, orange
@@ -105,12 +124,12 @@ let x_b = 440;
 let y_b = 400;
 let x_o = 360;
 let y_o = 400;
+let score = 0;
 
 
 function renderCell(state, adj) {
   const cell = document.createElement('div');
   cell.classList.add('cell');
-  
 
   switch (state) {
     case stateMap.blockState:
@@ -189,6 +208,7 @@ function main() {
 
 
   window.addEventListener('keydown', (event) => {
+    event.preventDefault();
     queryDir = dirMap[event.key];
     queryTicks = Math.floor(cellSize / pacSpeed);
   });
@@ -208,34 +228,107 @@ function main() {
     }
     grid.push(col);
   }
-  renderGrid();
-  requestAnimationFrame(animatePac);
 
-  // renderGhost(map1);
+  renderGrid();
+
+  requestAnimationFrame(animatePac);
 }
 
+
+// returns valid moving cells from adjacent cells
+function getPossible(x, y) {
+  let allowed = {'left': [x - 1, y],
+                'right': [x + 1, y], 
+                'up': [x, y - 1], 
+                'down': [x, y + 1]};
+  for (var k of Object.keys(allowed)) {
+    let i = allowed[k];
+    if (map[i[1]][i[0]] === 0) delete allowed[k];
+  }
+  return allowed;
+}
 
 function renderRed() {
-  ctx.drawImage(ghosts[1], x_r , y_r, ghostSize, ghostSize);
+  ctx.drawImage(ghosts[1], x_r - ghostSize/2, y_r - ghostSize/2, ghostSize, ghostSize);
+  let x_pos = Math.floor((x_r - cellSize/2 )/ cellSize);
+  let y_pos = Math.floor((y_r - cellSize/2 )/ cellSize);
+  let moves = getPossible(x_pos, y_pos);    // finds possible moves
 }
 
-function renderPink() {
-  ctx.drawImage(ghosts[2], x_p , y_p, ghostSize, ghostSize);
-}
-
-function renderBlue() {
-  ctx.drawImage(ghosts[3], x_b , y_b, ghostSize, ghostSize);
-}
-
-function renderOrange() {
-  ctx.drawImage(ghosts[4], x_o , y_o, ghostSize, ghostSize);
-}
 
 function renderGhost() {
-  renderRed();
-  renderPink();
-  renderBlue();
-  renderOrange();
+  ghosts.forEach(ghost => {
+    ctx.drawImage(ghost.image, ghost.currentPosition_x  - 20, ghost.currentPosition_y - 20, ghostSize, ghostSize);
+  })
+
+  ghosts.forEach(ghost => {
+
+    // finds the cell index of the ghost (x_pos, y_pos)
+    let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
+    let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
+
+    // if condition to check if the ghost is near the center or not
+    if ( isNaN(ghost.direction) || (
+      ((ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1)) && 
+      ((ghost.currentPosition_x % cellSize) >= ((cellSize / 2) - 1)) &&
+      ((ghost.currentPosition_y % cellSize) <= ((cellSize / 2) - 1)) && 
+      ((ghost.currentPosition_y % cellSize) >= ((cellSize / 2) + 1))) ) {
+      
+      ghost.currentPosition_x = (x_pos * cellSize) + (cellSize / 2);
+      ghost.currentPosition_y = (y_pos * cellSize) + (cellSize / 2);
+
+      let moves = getPossible(x_pos, y_pos);  // finds all possible moves
+
+      //selects a random move and updates the direction of the ghost
+      ghost.direction = Object.keys(moves)[Math.floor(Math.random() * Object.keys(moves).length)]; 
+
+      switch (ghost.direction) {
+        case 'left': 
+          ghost.currentPosition_x -= ghost.speed;
+          console.log(ghost.currentPosition_x);
+          break;
+        case 'right':  
+          ghost.currentPosition_x += ghost.speed;
+          break;
+        case 'up': 
+          ghost.currentPosition_y -= ghost.speed;
+          break;
+        case 'down': 
+          ghost.currentPosition_y += ghost.speed;
+          break;
+      }
+
+    //   if (ghost == ghosts[0]) {
+    //   }
+    //   else if (ghost == ghosts[1]) {
+    //   }
+    //   else if (ghost == ghosts[2]) {
+    //   }
+    //   else {
+    //   }
+
+    // }
+    }
+
+    // if ghost is not near the center, then updates the direction
+    else {
+      switch (ghost.direction) {
+        case 'left': 
+          ghost.currentPosition_x -= ghost.speed;
+          break;
+        case 'right':  
+          ghost.currentPosition_x += ghost.speed;
+          break;
+        case 'up': 
+          ghost.currentPosition_y -= ghost.speed;
+          break;
+        case 'down': 
+          ghost.currentPosition_y += ghost.speed;
+          break;
+      }
+    }
+  } )
+
 }
 
 
@@ -346,7 +439,4 @@ function init() {
   }, 0));
 }
 
-
-
 init();
-
