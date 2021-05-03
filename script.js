@@ -26,13 +26,14 @@ const map = map1;
 const gridHeight = map.length;
 const gridWidth = map[0].length;
 const cellSize = 40;
-const pacSize = 26;
+const pacSize = 20;
 
 const ghostSize = 40;
 const line_margin = 7;
 const pacSpeed = 3;
 const ghostSpeed = 3;
 
+const root = document.documentElement;
 const game = document.querySelector('#game');
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
@@ -93,6 +94,7 @@ let y_grid = 1;
 let queryTicks = 0;
 let queryDir = 0;
 let score = -10;
+let totalPoints = 0;
 
 // initial ghost coordinates red, oink, blue, orange
 let x_r = 400;
@@ -123,12 +125,14 @@ function renderCell(state, adj) {
       let childPoint = document.createElement('div');
       childPoint.classList.add('point');
       cell.appendChild(childPoint);
+      totalPoints++;
       break
 
     case stateMap.powerState:
       let child = document.createElement('div');
       child.classList.add('power');
       cell.appendChild(child);
+      totalPoints++;
       break;
     }
     return cell;
@@ -140,6 +144,8 @@ function eatCell() {
   if(cell.children.length) {
     cell.removeChild(cell.lastChild);
     score += scoreMap[map[y_grid][x_grid]];
+    totalPoints--;
+    if(totalPoints === 0) restart();
   }
   scoreDisplay.textContent = score;
   // console.log(score);
@@ -168,6 +174,7 @@ function turn() {
 
 
 function main() {
+  root.style.setProperty('--scale', Math.min(window.innerWidth / 1441, window.innerHeight / 952));
   const h = gridHeight * cellSize;
   const w = gridWidth * cellSize;
   game.style.height = `${h}px`;
@@ -180,10 +187,13 @@ function main() {
   game.style.border = '2px solid blue';
 
 
+
   window.addEventListener('keydown', (event) => {
     queryDir = dirMap[event.key];
     queryTicks = Math.floor(cellSize / pacSpeed);
   });
+
+  window.addEventListener('resize', () => root.style.setProperty('--scale', Math.min(window.innerWidth / 1441, window.innerHeight / 952)));
   
 
   for (let xc = 0; xc < gridWidth; xc++) {
@@ -298,6 +308,36 @@ function renderPac() {
 }
 
 
+function restart() {
+  for(let x = 0; x < grid.length; x++) {
+    for(let y = 0; y < grid[0].length; y++) {
+      const cell = grid[x][y]
+      if(map[y][x] === stateMap.pointState) {
+        let childPoint = document.createElement('div');
+        childPoint.classList.add('point');
+        cell.appendChild(childPoint);
+        totalPoints++;
+      }
+      else if (map[y][x] === stateMap.powerState){
+        let child = document.createElement('div');
+        child.classList.add('power');
+        cell.appendChild(child);
+        totalPoints++;
+      }
+    }
+  }
+  state = 0;
+  x = 60;
+  y = 60;
+  dir = 4;
+  x_grid = 1;
+  y_grid = 1;
+  queryTicks = 0;
+  queryDir = 0;
+  
+}
+
+
 function init() {
   window.addEventListener("load", () => setTimeout( function (event) {
     const preloader = document.querySelector("#pre");
@@ -305,6 +345,8 @@ function init() {
     main();
   }, 0));
 }
+
+
 
 init();
 
