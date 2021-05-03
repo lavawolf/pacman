@@ -270,8 +270,8 @@ function renderGhost() {
     console.log(ghost.currentPosition_x % cellSize);
     // if condition to check if the ghost is near the center or not
     if ( 
-      ( !((cellSize / 2) - 1) <= (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) ) && 
-      ( !((cellSize / 2) - 1) <= (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) + 1) )
+      ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) ) && 
+      ( ((cellSize / 2) - 1) <= (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) + 1) )
       ) {
       
       ghost.currentPosition_x = (x_pos * cellSize) + (cellSize / 2);
@@ -314,7 +314,8 @@ function renderGhost() {
 
     // }
     }
-    // if ghost is not near the center, then updates the direction
+
+    // if ghost is not near the center, then moves the ghost in the direction it is already moving
     else {
       console.log(ghost.direction);
       switch (ghost.direction) {
