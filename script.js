@@ -204,7 +204,6 @@ function main() {
   // renderGhost(map1);
 }
 
-
 function renderRed() {
   ctx.drawImage(ghosts[1], x_r , y_r, ghostSize, ghostSize);
 }
@@ -221,11 +220,6 @@ function renderOrange() {
   ctx.drawImage(ghosts[4], x_o , y_o, ghostSize, ghostSize);
 }
 
-function renderGhost() {
-  renderRed();
-  renderPink();
-  renderBlue();
-  renderOrange();
 }
 
 
