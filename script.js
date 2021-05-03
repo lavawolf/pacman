@@ -242,29 +242,26 @@ function renderGhost() {
     // finds the cell index of the ghost (x_pos, y_pos)
     let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
     let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
-        
-    console.log(ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1);
 
     // if condition to check if the ghost is near the center or not
     if ( isNaN(ghost.direction) || (
-      (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) && 
-      (ghost.currentPosition_x % cellSize) >= ((cellSize / 2) - 1) &&
-      (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) - 1) && 
-      (ghost.currentPosition_y % cellSize) >= ((cellSize / 2) + 1)) ) {
-        
-        console.log('hi');
+      ((ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1)) && 
+      ((ghost.currentPosition_x % cellSize) >= ((cellSize / 2) - 1)) &&
+      ((ghost.currentPosition_y % cellSize) <= ((cellSize / 2) - 1)) && 
+      ((ghost.currentPosition_y % cellSize) >= ((cellSize / 2) + 1))) ) {
+      
       ghost.currentPosition_x = (x_pos * cellSize) + (cellSize / 2);
       ghost.currentPosition_y = (y_pos * cellSize) + (cellSize / 2);
 
       let moves = getPossible(x_pos, y_pos);  // finds all possible moves
 
-      let move = moves[Math.floor(Math.random() * moves.length)];   //selects a random move
-
-      ghost.direction = Object.keys(move)[0];   // updates the direction of the ghost
+      //selects a random move and updates the direction of the ghost
+      ghost.direction = Object.keys(moves)[Math.floor(Math.random() * Object.keys(moves).length)]; 
 
       switch (ghost.direction) {
         case 'left': 
           ghost.currentPosition_x -= ghost.speed;
+          console.log(ghost.currentPosition_x);
           break;
         case 'right':  
           ghost.currentPosition_x += ghost.speed;
@@ -289,8 +286,8 @@ function renderGhost() {
     // }
     }
 
+    // if ghost is not near the center, then updates the direction
     else {
-
       switch (ghost.direction) {
         case 'left': 
           ghost.currentPosition_x -= ghost.speed;
