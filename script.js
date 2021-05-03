@@ -53,14 +53,18 @@ pac2.src = './pacman_characters/pacman_eating.png';
 class Ghost{
   constructor(Name, start, speed, image) {
     this.className = Name;
-    this.startPosition = start;
+    this.startPosition_x = start[0];
+    this.startPosition_y = start[1];
     this.currentPosition_x = start[0];
     this.currentPosition_y = start[1];
     this.speed = speed;
     this.image = image;
     this.direction = NaN;
+    this.directionRev = NaN;
   }
 }
+
+const dirRev = {'left': 'right', 'right': 'left', 'up': 'down', 'down': 'up'}
 
 // Ghost images
 const ghost_red = new Image();
@@ -206,7 +210,6 @@ function main() {
   game.style.border = '2px solid blue';
 
 
-
   window.addEventListener('keydown', (event) => {
     event.preventDefault();
     queryDir = dirMap[event.key];
@@ -234,7 +237,6 @@ function main() {
   requestAnimationFrame(animatePac);
 }
 
-
 // returns valid cells to move from the adjacent cells of the current cell
 function getPossible(x, y) {
   let allowed = {'left': [x - 1, y],
@@ -248,61 +250,64 @@ function getPossible(x, y) {
   return allowed;
 }
 
-// function renderRed() {
-//   ctx.drawImage(ghosts[1], x_r - ghostSize/2, y_r - ghostSize/2, ghostSize, ghostSize);
-//   let x_pos = Math.floor((x_r - cellSize/2 )/ cellSize);
-//   let y_pos = Math.floor((y_r - cellSize/2 )/ cellSize);
-//   let moves = getPossible(x_pos, y_pos);    // finds possible moves
-// }
-
-// let a = 0;
-
+ let a = 0;
 function renderGhost() {
+
+  // drawing the ghosts
   ghosts.forEach(ghost => {
     ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
   })
 
+  // moving the ghosts
   ghosts.forEach(ghost => {
 
     // finds the cell index of the ghost (x_pos, y_pos)
     let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
     let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
 
-    if (ghost.startPosition == [ghost.currentPosition_x, ghost.currentPosition_y]){
-      switch (ghost.Name) {
+    //find all possible moves for the ghost
+    let moves = getPossible(x_pos, y_pos); 
+
+    // assign direction to ghost if it is at starting point
+    if ( JSON.stringify(ghost.startPosition_x) == JSON.stringify(ghost.currentPosition_x) && 
+      JSON.stringify(ghost.startPosition_y) == JSON.stringify(ghost.currentPosition_y) ){
+      
+      switch (ghost.className) {
         case 'red':
           ghost.direction = 'up';
+          ghost.directionRev = dirRev['up'];
           break;
         case 'pink':
           ghost.direction = 'up';
+          ghost.directionRev = dirRev['up'];
           break;
         case 'blue' :
           ghost.direction = 'left';
+          ghost.directionRev = dirRev['left'];
           break;
         case 'orange':
           ghost.direction = 'right';
+          ghost.directionRev = dirRev['right'];
           break;
       }
     }
+    
     // condition to check if the ghost is near the center of the cell or not
-
-    console.log(ghost.currentPosition_x % cellSize, ghost.currentPosition_y % cellSize);
-
-    if (
+    if ( 
+      ( 
       ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x % cellSize) && (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) ) && 
       ( ((cellSize / 2) - 1) <= (ghost.currentPosition_y % cellSize) && (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) + 1) )
-      ) {
+      )) {
       
-      // console.log(ghost.currentPosition_x % cellSize);  
+      // resets ghost to center of the cell
       ghost.currentPosition_x = (x_pos * cellSize) + (cellSize / 2);
       ghost.currentPosition_y = (y_pos * cellSize) + (cellSize / 2);
 
-      let moves = getPossible(x_pos, y_pos);  // finds all possible moves
+      //selects a random move and updates the direction of the ghost if it is at the end of line
+      if ( moves.hasOwnProperty(ghost.directionRev) ) delete moves[ghost.directionRev];
 
-      //selects a random move and updates the direction of the ghost
       ghost.direction = Object.keys(moves)[Math.floor(Math.random() * Object.keys(moves).length)]; 
-
-      // console.log(ghost.direction);
+      ghost.directionRev = dirRev[ghost.direction];
 
       switch (ghost.direction) {
         case 'left': 
@@ -318,22 +323,10 @@ function renderGhost() {
           ghost.currentPosition_y += ghost.speed;
           break;
       }
-
-    //   if (ghost == ghosts[0]) {
-    //   }
-    //   else if (ghost == ghosts[1]) {
-    //   }
-    //   else if (ghost == ghosts[2]) {
-    //   }
-    //   else {
-    //   }
-
-    // }
     }
 
-    // if ghost is not near the center, then moves the ghost in the direction it is already moving
+    // if ghost is not near the center, then in keeps moving in the direction it is already moving
     else {
-      console.log(ghost.direction);
       switch (ghost.direction) {
         case 'left': 
           ghost.currentPosition_x -= ghost.speed;
@@ -349,7 +342,6 @@ function renderGhost() {
           break;
       }
     }
-    // console.log(ghost.currentPosition_x);
 
   } )
 
@@ -452,7 +444,6 @@ function restart() {
   queryDir = 0;
   
 }
-
 
 function init() {
   window.addEventListener("load", () => setTimeout( function (event) {
