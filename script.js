@@ -28,7 +28,7 @@ const gridWidth = map[0].length;
 const cellSize = 40;
 const pacSize = 26;
 
-const ghostSize = 40;
+const ghostSize = 30;
 const line_margin = 7;
 const pacSpeed = 3;
 const ghostSpeed = 2;
@@ -211,7 +211,7 @@ function main() {
 }
 
 
-// returns valid moving cells from adjacent cells
+// returns valid cells to move from the adjacent cells of the current cell
 function getPossible(x, y) {
   let allowed = {'left': [x - 1, y],
                 'right': [x + 1, y], 
@@ -224,17 +224,16 @@ function getPossible(x, y) {
   return allowed;
 }
 
-function renderRed() {
-  ctx.drawImage(ghosts[1], x_r - ghostSize/2, y_r - ghostSize/2, ghostSize, ghostSize);
-  let x_pos = Math.floor((x_r - cellSize/2 )/ cellSize);
-  let y_pos = Math.floor((y_r - cellSize/2 )/ cellSize);
-  let moves = getPossible(x_pos, y_pos);    // finds possible moves
-}
-
+// function renderRed() {
+//   ctx.drawImage(ghosts[1], x_r - ghostSize/2, y_r - ghostSize/2, ghostSize, ghostSize);
+//   let x_pos = Math.floor((x_r - cellSize/2 )/ cellSize);
+//   let y_pos = Math.floor((y_r - cellSize/2 )/ cellSize);
+//   let moves = getPossible(x_pos, y_pos);    // finds possible moves
+// }
 
 function renderGhost() {
   ghosts.forEach(ghost => {
-    ctx.drawImage(ghost.image, ghost.currentPosition_x  - 20, ghost.currentPosition_y - 20, ghostSize, ghostSize);
+    ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
   })
 
   ghosts.forEach(ghost => {
@@ -243,12 +242,13 @@ function renderGhost() {
     let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
     let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
 
+
+    console.log(ghost.currentPosition_x % cellSize);
     // if condition to check if the ghost is near the center or not
-    if ( isNaN(ghost.direction) || (
-      ((ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1)) && 
-      ((ghost.currentPosition_x % cellSize) >= ((cellSize / 2) - 1)) &&
-      ((ghost.currentPosition_y % cellSize) <= ((cellSize / 2) - 1)) && 
-      ((ghost.currentPosition_y % cellSize) >= ((cellSize / 2) + 1))) ) {
+    if ( 
+      ( !((cellSize / 2) - 1) <= (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) ) && 
+      ( !((cellSize / 2) - 1) <= (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) + 1) )
+      ) {
       
       ghost.currentPosition_x = (x_pos * cellSize) + (cellSize / 2);
       ghost.currentPosition_y = (y_pos * cellSize) + (cellSize / 2);
@@ -258,6 +258,8 @@ function renderGhost() {
       //selects a random move and updates the direction of the ghost
       ghost.direction = Object.keys(moves)[Math.floor(Math.random() * Object.keys(moves).length)]; 
 
+      // console.log(ghost.direction);
+
       switch (ghost.direction) {
         case 'left': 
           ghost.currentPosition_x -= ghost.speed;
@@ -265,12 +267,15 @@ function renderGhost() {
           break;
         case 'right':  
           ghost.currentPosition_x += ghost.speed;
+          console.log(ghost.currentPosition_x);
           break;
         case 'up': 
           ghost.currentPosition_y -= ghost.speed;
+          console.log(ghost.currentPosition_y);
           break;
         case 'down': 
           ghost.currentPosition_y += ghost.speed;
+          console.log(ghost.currentPosition_y);
           break;
       }
 
@@ -285,9 +290,9 @@ function renderGhost() {
 
     // }
     }
-
     // if ghost is not near the center, then updates the direction
     else {
+      console.log(ghost.direction);
       switch (ghost.direction) {
         case 'left': 
           ghost.currentPosition_x -= ghost.speed;
@@ -303,6 +308,8 @@ function renderGhost() {
           break;
       }
     }
+    // console.log(ghost.currentPosition_x);
+
   } )
 
 }
