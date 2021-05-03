@@ -76,9 +76,9 @@ ghost_scared.src = './pacman_characters/scared_ghost.png';
 
 // initialising the ghosts with name, initial coordinates, speed, and image src
 const ghosts = [
-  new Ghost('red', [420, 380], 2.5, ghost_red), 
+  new Ghost('red', [420, 380], 2, ghost_red), 
   new Ghost('pink', [420, 420], 3, ghost_pink), 
-  new Ghost('blue', [460, 420], 2.5, ghost_blue), 
+  new Ghost('blue', [460, 420], 2, ghost_blue), 
   new Ghost('orange', [380, 420], 3, ghost_orange) ];
 
 
@@ -255,6 +255,8 @@ function getPossible(x, y) {
 //   let moves = getPossible(x_pos, y_pos);    // finds possible moves
 // }
 
+// let a = 0;
+
 function renderGhost() {
   ghosts.forEach(ghost => {
     ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
@@ -266,14 +268,36 @@ function renderGhost() {
     let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
     let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
 
+    // if (a<5) {
+    //   console.log([ghost.currentPosition_x, ghost.currentPosition_y]);
+    //   a++;
+    // }  
+    // if (ghost.startPosition == [ghost.currentPosition_x, ghost.currentPosition_y]){
+    //   switch (ghost.Name) {
+    //     case 'red':
+    //       ghost.direction = 'up';
+    //       break;
+    //     case 'pink':
+    //       ghost.direction = 'up';
+    //       break;
+    //     case 'blue' :
+    //       ghost.direction = 'left';
+    //       break;
+    //     case 'orange':
+    //       ghost.direction = 'right';
+    //       break;
+    //   }
+    // }
+    // condition to check if the ghost is near the center of the cell or not
 
-    console.log(ghost.currentPosition_x % cellSize);
-    // if condition to check if the ghost is near the center or not
-    if ( 
+    console.log(ghost.currentPosition_x % cellSize, ghost.currentPosition_y % cellSize);
+
+    if (
       ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) ) && 
       ( ((cellSize / 2) - 1) <= (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) + 1) )
       ) {
       
+      // console.log(ghost.currentPosition_x % cellSize);  
       ghost.currentPosition_x = (x_pos * cellSize) + (cellSize / 2);
       ghost.currentPosition_y = (y_pos * cellSize) + (cellSize / 2);
 
@@ -287,19 +311,15 @@ function renderGhost() {
       switch (ghost.direction) {
         case 'left': 
           ghost.currentPosition_x -= ghost.speed;
-          console.log(ghost.currentPosition_x);
           break;
         case 'right':  
           ghost.currentPosition_x += ghost.speed;
-          console.log(ghost.currentPosition_x);
           break;
         case 'up': 
           ghost.currentPosition_y -= ghost.speed;
-          console.log(ghost.currentPosition_y);
           break;
         case 'down': 
           ghost.currentPosition_y += ghost.speed;
-          console.log(ghost.currentPosition_y);
           break;
       }
 
