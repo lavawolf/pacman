@@ -74,6 +74,7 @@ const ghost_blue = new Image();
 ghost_blue.src = './pacman_characters/blue_ghost.png';
 const ghost_scared = new Image();
 ghost_scared.src = './pacman_characters/scared_ghost.png';
+const ghost_images = [ghost_red, ghost_pink, ghost_blue, ghost_orange, ghost_scared];
 
 // initialising the ghosts with name, initial coordinates, speed, and image src
 const ghosts = [
@@ -114,6 +115,7 @@ let y_grid = 1;
 let queryTicks = 0;
 let queryDir = 0;
 let totalPoints = 0;
+let powerUp = false;
 
 let score = 0;
 let lives = 3;
@@ -173,11 +175,13 @@ function eatCell() {
     score += scoreMap[map[y_grid][x_grid]];
     playSound(eatPoint);
     totalPoints--;
+    if (map[y_grid][x_grid] === stateMap.powerState) {
+      powerUp = true;
+    }
     if(totalPoints === 0) restart();
   }
   scoreDisplay.textContent = score;
 }
-
 
 function turn() {
   if ((dir + queryDir) % 2 == 0) {
@@ -221,7 +225,6 @@ function main() {
 
   window.addEventListener('resize', () => root.style.setProperty('--scale', Math.min(window.innerWidth / 1441, window.innerHeight / 952)));
   
-
   for (let xc = 0; xc < gridWidth; xc++) {
     const col = [];
     for (let yc = 0; yc < gridHeight; yc++) {
@@ -260,9 +263,7 @@ function getPossible(x, y) {
   return allowed;
 }
 
-
 function NextMove(ghost) {
-
   switch (ghost.direction) {
     case 'left': 
       ghost.currentPosition_x -= ghost.speed;
@@ -279,16 +280,15 @@ function NextMove(ghost) {
   }
 }
 
-
 // function to decrease life of pacman or call the end of game
 function IsEaten(ghost) {
 
-  // checks if the ghost is near the pacman
-  if (JSON.stringify(ghost.currentPosition_x) >= x - 5 && JSON.stringify(ghost.currentPosition_x) <= x + 5 &&
-      JSON.stringify(ghost.currentPosition_y) >= y - 5 && JSON.stringify(ghost.currentPosition_y) <= y + 5){
+  if (JSON.stringify(ghost.currentPosition_x) >= x - 8 && JSON.stringify(ghost.currentPosition_x) <= x + 8 &&
+      JSON.stringify(ghost.currentPosition_y) >= y - 8 && JSON.stringify(ghost.currentPosition_y) <= y + 8){
     
     lives--;
     playSound(death);
+
     //reinitialize ghosts and pacman positions
     ghosts.forEach( ghostNew => {
       ghostNew.currentPosition_x = ghostNew.startPosition_x;
@@ -302,49 +302,49 @@ function IsEaten(ghost) {
   return false;
 }
 
+// sets direction and directionRev for ghost if at starting position
+function setDirection (ghost) {
+  switch (ghost.className) {
+    case 'red':
+      ghost.direction = 'up';
+      ghost.directionRev = dirRev['up'];
+      break;
+    case 'pink':
+      ghost.direction = 'up';
+      ghost.directionRev = dirRev['up'];
+      break;
+    case 'blue':
+      ghost.direction = 'left';
+      ghost.directionRev = dirRev['left'];
+      break;
+    case 'orange':
+      ghost.direction = 'right';
+      ghost.directionRev = dirRev['right'];
+      break;
+  }
+}
 
 // moving the ghosts
 function MoveGhosts() {
 
   ghosts.forEach(ghost => {
-
     // checks if pacman has eaten ghost
     if (IsEaten(ghost)) return;
 
-    // Orange_ghost moves only after 100 points are scored
     if (ghost.className == 'orange') {
       if (score < 100) return;
     }
 
-    // finds the cell index of the ghost (x_pos, y_pos)
     let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
     let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
 
     //find all possible moves for the ghost
     let moves = getPossible(x_pos, y_pos); 
 
-    // assign direction to ghost if it is at starting point
+    // assign direction to ghost if ghost is at starting point
     if ( JSON.stringify(ghost.startPosition_x) == JSON.stringify(ghost.currentPosition_x) && 
       JSON.stringify(ghost.startPosition_y) == JSON.stringify(ghost.currentPosition_y) ){
-      
-      switch (ghost.className) {
-        case 'red':
-          ghost.direction = 'up';
-          ghost.directionRev = dirRev['up'];
-          break;
-        case 'pink':
-          ghost.direction = 'up';
-          ghost.directionRev = dirRev['up'];
-          break;
-        case 'blue':
-          ghost.direction = 'left';
-          ghost.directionRev = dirRev['left'];
-          break;
-        case 'orange':
-          ghost.direction = 'right';
-          ghost.directionRev = dirRev['right'];
-          break;
-      }
+      setDirection(ghost);
     }
 
     // condition to check if the ghost is near the center of the cell or not
@@ -362,24 +362,31 @@ function MoveGhosts() {
       ghost.direction = Object.keys(moves)[Math.floor(Math.random() * Object.keys(moves).length)]; 
       ghost.directionRev = dirRev[ghost.direction];
 
-      // moves the ghost in the respective direction
       NextMove(ghost);
     }
 
-    // if ghost is not near the center, then it keeps moving in the same direction
     else NextMove(ghost);
-
   } )
 
 }
 
 
 function renderGhost() {
+  let i = 0;
   // drawing the ghosts
   ghosts.forEach(ghost => {
-    ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
-  })
 
+    //checks if ghost is scared or not
+    if (powerUp) {
+      ghost.image = ghost_scared;
+    }
+    else {
+      ghost.image = ghost_images[i];
+    }
+    
+    ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
+    i++;
+  })
   MoveGhosts();
 }
 
