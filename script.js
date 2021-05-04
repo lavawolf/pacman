@@ -115,7 +115,7 @@ let y_grid = 1;
 let queryTicks = 0;
 let queryDir = 0;
 let totalPoints = 0;
-let powerUp = false;
+let powerTime = 0;
 
 let score = 0;
 let lives = 3;
@@ -176,7 +176,7 @@ function eatCell() {
     playSound(eatPoint);
     totalPoints--;
     if (map[y_grid][x_grid] === stateMap.powerState) {
-      powerUp = true;
+      powerTime = 60*6;
     }
     if(totalPoints === 0) restart();
   }
@@ -377,7 +377,7 @@ function renderGhost() {
   ghosts.forEach(ghost => {
 
     //checks if ghost is scared or not
-    if (powerUp) {
+    if (powerTime > 0) {
       ghost.image = ghost_scared;
     }
     else {
@@ -438,6 +438,10 @@ function animatePac() {
   }
   if ((x - cellSize / 2) % cellSize <= pacSpeed && (y - cellSize / 2) % cellSize <= pacSpeed) {
     eatCell(grid[x_grid][y_grid]);
+  }
+
+  if (powerTime > 0) {
+    powerTime --;
   }
   
   // if(dir === 0 || dir === 3) eatCell(grid[x_grid][y_grid]);
@@ -507,6 +511,7 @@ function restart() {
   } )
   lives = 3;
   score = 0;
+  powerTime = 0;
   PacReset();
 }
 
