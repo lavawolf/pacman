@@ -22,10 +22,6 @@ const map1 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ]
 
-class Pacman {
-  
-}
-
 const map = map1;
 const gridHeight = map.length;
 const gridWidth = map[0].length;
@@ -61,7 +57,7 @@ class Ghost{
     this.image = image;
     this.direction = NaN;
     this.directionRev = NaN;
-    
+    this.IsScared = false;
   }
 }
 
@@ -154,11 +150,28 @@ function renderCell(state, adj) {
 }
 
 
+const eatPoint = new Audio();
+eatPoint.src = './sounds/eatPoint.wav';
+const death = new Audio();
+death.src = './sounds/Death.mp3';
+const powerPill = new Audio();
+powerPill.src = './sounds/powerPill.mp3';
+const ghost = new Audio();
+ghost.src = './sounds/Ghost.mp3';
+
+
+function playSound(audio) {
+  const sound = audio;
+  sound.playbackRate = 1.15;
+  sound.play();
+}
+
 function eatCell() {
   const cell = grid[x_grid][y_grid];
   if(cell.children.length) {
     cell.removeChild(cell.lastChild);
     score += scoreMap[map[y_grid][x_grid]];
+    playSound(eatPoint);
     totalPoints--;
     if(totalPoints === 0) restart();
   }
@@ -199,7 +212,6 @@ function main() {
   ctx.canvas.width = w;
   scoreboard.style.height = game.style.height;
   game.style.border = '2px solid blue';
-  // livesDisplay.style.height = game.style.height;
 
   window.addEventListener('keydown', (event) => {
     event.preventDefault();
@@ -227,6 +239,13 @@ function main() {
 
   requestAnimationFrame(animatePac);
 }
+
+
+async function wait() {
+  await sleep (1800);
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // returns valid cells to move from the adjacent cells of the current cell
 function getPossible(x, y) {
@@ -269,14 +288,15 @@ function IsEaten(ghost) {
       JSON.stringify(ghost.currentPosition_y) >= y - 5 && JSON.stringify(ghost.currentPosition_y) <= y + 5){
     
     lives--;
-
+    playSound(death);
     //reinitialize ghosts and pacman positions
     ghosts.forEach( ghostNew => {
       ghostNew.currentPosition_x = ghostNew.startPosition_x;
       ghostNew.currentPosition_y = ghostNew.startPosition_y;
     } )
     PacReset();
-
+    // to wait for some time before restarting
+    wait();
     return true;
   }
   return false;
@@ -444,8 +464,10 @@ function GameEnd() {
 
 function PacReset() {
   state = 0;
-  x = 60;
-  y = 60;
+  if (lives != 0) {
+    x = 60;
+    y = 60;
+  }
   dir = 4;
   x_grid = 1;
   y_grid = 1;
