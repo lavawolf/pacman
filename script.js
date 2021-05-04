@@ -387,6 +387,7 @@ function renderGhost() {
     ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
     i++;
   })
+  if (score == 0) return;
   MoveGhosts();
 }
 
