@@ -1,5 +1,5 @@
 :root {
-  --preload-time: 3s;
+  --preload-time: 5s;
   --scale: 0.5;
 }
 
@@ -33,7 +33,6 @@ body {
 }
 
 #game {
-  /* border: 2px solid blue; */
   overflow: hidden;
   align-items: center;
   display: flex;
@@ -43,7 +42,6 @@ body {
 }
 
 #container {
-  /* border: 2px solid blue; */
   overflow: hidden;
   align-items: center;
   display: flex;
@@ -59,12 +57,6 @@ body {
   padding: 0px;
   border: 2px solid black;
 }
-
-/* #score {
-  color: white;
-  margin: 50px;
-  font-family: 'emulogic';
-} */
 
 .point {
   width: 6px;
@@ -101,17 +93,38 @@ body {
   /* justify-content: center; */
 }
 
-
 canvas {
   background-color: transparent;
   position: absolute;
 }
 
+
 /*Preloading page CSS properties*/
+
+#start_button  {
+  position: relative;
+  align-items: center;
+  width: 15%;
+  height: 15vh;
+  background-color: yellow;
+  display: flex;
+  justify-content: center;
+  color: black;
+  font-size: 250%;
+  cursor: pointer;
+  border: 0;
+  padding: 12px 40px;
+  border-radius: 50px;background-image: linear-gradient(-180deg, #e9ff6d 0%, #fffc35 100%);
+  box-shadow: 0 1rem 1.25rem 0 rgba(190, 238, 15, 0.5), 0 -0.25rem 1.5rem 
+                               rgb(185, 235, 48) inset, 0 0.75rem 0.5rem 
+                               rgba(238, 255, 0, 0.4) inset, 0 0.25rem 0.5rem 0 
+                               rgb(255, 230, 5) inset;
+}
+
 
 .pre-loader {
   position: fixed;
-  top: 0;
+  top: 20%;
   width: 100%;
   height: 100vh;
   background-color: black;
@@ -126,63 +139,33 @@ canvas {
   pointer-events: none;
 }
 
-#title-preload {
+.title-preload {
   position: absolute;
   font-family: 'pacfontregular';
   font-size: 20px;
   color:yellow;
-  top: 15%;
+  top: 30%;
   transform: translateY(-15%);
   text-align: center;
   animation: textzoom var(--preload-time);
   animation-timing-function: linear;
+  z-index: 1;
 }
 
 .pacman {
   position: absolute;
-  height: 60px;
-  width: 60px;
+  align-self: center;
+  min-width: 60%;
+  max-width: 60%;
+  height: auto;
   top: 60%;
-  left: 0%;
-  transform: translate(0%, -60%);
-  animation: pacman-run var(--preload-time);
-  animation-timing-function: linear;
-}
-
-.ball {
-  position: absolute;
-  height: 25px;
-  width: 25px;
-  top: 60%;
-  left: 4%;
-  transform: translate(4%, -60%);
-  animation: ball-run var(--preload-time);
-  animation-timing-function: linear;
 }
 
 @keyframes textzoom {
   0%{
-    font-size: 90px;
+    font-size: 100px;
   }
   100%{
-    font-size: 125px;
-  }
-}
-
-@keyframes pacman-run {
-  from {
-    left: 0%;
-  }
-  to {
-    left: 100%;
-  }
-}
-
-@keyframes ball-run {
-  from {
-    left: 6%;
-  }
-  to {
-    left: 106%;
+    font-size: 150px;
   }
 }

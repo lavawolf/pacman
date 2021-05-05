@@ -1,6 +1,6 @@
 'use strict';
 
-const map1 = [
+const map = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
   [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
@@ -22,7 +22,7 @@ const map1 = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ]
 
-const map = map1;
+// const map = map1;
 const gridHeight = map.length;
 const gridWidth = map[0].length;
 const cellSize = 40;
@@ -58,6 +58,8 @@ class Ghost{
     this.direction = NaN;
     this.directionRev = NaN;
     this.IsScared = false;
+    this.isDead = false;
+    this.hasLeft = false;
   }
 }
 
@@ -74,14 +76,16 @@ const ghost_blue = new Image();
 ghost_blue.src = './pacman_characters/blue_ghost.png';
 const ghost_scared = new Image();
 ghost_scared.src = './pacman_characters/scared_ghost.png';
+
 const ghost_images = [ghost_red, ghost_pink, ghost_blue, ghost_orange, ghost_scared];
+const ghost_speeds = [2.20, 2.80, 2.50, 3.00]
 
 // initialising the ghosts with name, initial coordinates, speed, and image src
 const ghosts = [
-  new Ghost('red', [420, 380], 2, ghost_red), 
-  new Ghost('pink', [420, 420], 3, ghost_pink), 
-  new Ghost('blue', [460, 420], 2, ghost_blue), 
-  new Ghost('orange', [380, 420], 3, ghost_orange) ];
+  new Ghost('red', [420, 380], ghost_speeds[0], ghost_red), 
+  new Ghost('pink', [420, 420], ghost_speeds[1], ghost_pink), 
+  new Ghost('blue', [460, 420], ghost_speeds[2], ghost_blue), 
+  new Ghost('orange', [380, 420], ghost_speeds[3], ghost_orange) ];
 
 // defines the state of each cell
 const stateMap = {
@@ -116,8 +120,10 @@ let queryTicks = 0;
 let queryDir = 0;
 let totalPoints = 0;
 let powerTime = 0;
+let ghostsEaten = 0;
 
 let score = 0;
+let highScore = 0;
 let lives = 3;
 
 
@@ -132,14 +138,14 @@ function renderCell(state, adj) {
       if (adj.right) cell.style.borderRight = '2px solid blue';
       if (adj.top) cell.style.borderTop = '2px solid blue';
       if (adj.bottom) cell.style.borderBottom = '2px solid blue';
-      break
+      break;
 
     case stateMap.pointState:
       let childPoint = document.createElement('div');
       childPoint.classList.add('point');
       cell.appendChild(childPoint);
       totalPoints++;
-      break
+      break;
 
     case stateMap.powerState:
       let child = document.createElement('div');
@@ -157,14 +163,22 @@ eatPoint.src = './sounds/eatPoint.wav';
 const death = new Audio();
 death.src = './sounds/Death.mp3';
 const powerPill = new Audio();
-powerPill.src = './sounds/powerPill.mp3';
+powerPill.src = './sounds/eat_powerpill.mp3';
 const ghost = new Audio();
 ghost.src = './sounds/Ghost.mp3';
+const intro_music = new Audio;
+intro_music.src = './sounds/intro-music.mp3';
+const power_audio = new Audio;
+power_audio.src = './sounds/power_is_active.wav';
+const eat_ghost = new Audio;
+eat_ghost.src = './sounds/eat_ghost.wav';
+const ghost_retreat = new Audio;
+ghost_retreat.src = './sounds/ghost_retreating.wav';
 
 
-function playSound(audio) {
+function playSound(audio, rate = 1.15) {
   const sound = audio;
-  sound.playbackRate = 1.15;
+  if (sound != intro_music) sound.playbackRate = rate;
   sound.play();
 }
 
@@ -176,7 +190,12 @@ function eatCell() {
     playSound(eatPoint);
     totalPoints--;
     if (map[y_grid][x_grid] === stateMap.powerState) {
-      powerTime = 60*6;
+      powerTime += 60*7;
+      playSound(powerPill);
+      ghostsEaten = 0;
+      ghosts.forEach( ghost => {
+        ghost.isDead = false;
+      })
     }
     if(totalPoints === 0) restart();
   }
@@ -251,7 +270,7 @@ async function wait() {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // returns valid cells to move from the adjacent cells of the current cell
-function getPossible(x, y) {
+function getPossible(x, y, ghost) {
   let allowed = {'left': [x - 1, y],
                 'right': [x + 1, y], 
                 'up': [x, y - 1], 
@@ -259,6 +278,9 @@ function getPossible(x, y) {
   for (var k of Object.keys(allowed)) {
     let i = allowed[k];
     if (map[i[1]][i[0]] === 0) delete allowed[k];
+    if (ghost.hasLeft) {
+      if (i[1] == 9 && i[0] == 10) delete allowed[k];
+    }
   }
   return allowed;
 }
@@ -283,20 +305,37 @@ function NextMove(ghost) {
 // function to decrease life of pacman or call the end of game
 function IsEaten(ghost) {
 
-  if (JSON.stringify(ghost.currentPosition_x) >= x - 8 && JSON.stringify(ghost.currentPosition_x) <= x + 8 &&
-      JSON.stringify(ghost.currentPosition_y) >= y - 8 && JSON.stringify(ghost.currentPosition_y) <= y + 8){
+  if (JSON.stringify(ghost.currentPosition_x) >= x - 7 && JSON.stringify(ghost.currentPosition_x) <= x + 7 &&
+      JSON.stringify(ghost.currentPosition_y) >= y - 7 && JSON.stringify(ghost.currentPosition_y) <= y + 7){
     
-    lives--;
-    playSound(death);
+    // ghosts are scared pacman lives
+    if (ghost.IsScared){
+      playSound(eat_ghost);
+      playSound(ghost_retreat);
+      ghost.currentPosition_x = ghost.startPosition_x;
+      ghost.currentPosition_y = ghost.startPosition_y;
+      ghost.hasLeft = false;
+      ghost.isDead = true;
+      score += 200 * ( 2**ghostsEaten);
+      ghostsEaten++;
+    }
 
-    //reinitialize ghosts and pacman positions
-    ghosts.forEach( ghostNew => {
-      ghostNew.currentPosition_x = ghostNew.startPosition_x;
-      ghostNew.currentPosition_y = ghostNew.startPosition_y;
-    } )
-    PacReset();
-    // to wait for some time before restarting
-    wait();
+    // ghosts are not scared pacman dies
+    else {
+      lives--;
+      playSound(death);
+      powerTime = 0;
+
+      //reinitialize ghosts and pacman positions
+      ghosts.forEach( ghostNew => {
+        ghostNew.currentPosition_x = ghostNew.startPosition_x;
+        ghostNew.currentPosition_y = ghostNew.startPosition_y;
+        ghostNew.hasLeft = false;
+      } )
+      PacReset();
+      // to wait for some time before restarting
+      // wait();
+    }
     return true;
   }
   return false;
@@ -331,15 +370,17 @@ function MoveGhosts() {
     // checks if pacman has eaten ghost
     if (IsEaten(ghost)) return;
 
-    if (ghost.className == 'orange') {
-      if (score < 100) return;
+    if (ghost.className == 'orange' || ghost.className == 'blue') {
+      if (score < 150) return;
     }
 
     let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
     let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
 
+    if (x_pos == 10 && y_pos == 8) ghost.hasLeft = true;
+
     //find all possible moves for the ghost
-    let moves = getPossible(x_pos, y_pos); 
+    let moves = getPossible(x_pos, y_pos, ghost); 
 
     // assign direction to ghost if ghost is at starting point
     if ( JSON.stringify(ghost.startPosition_x) == JSON.stringify(ghost.currentPosition_x) && 
@@ -348,8 +389,8 @@ function MoveGhosts() {
     }
 
     // condition to check if the ghost is near the center of the cell or not
-    if ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x % cellSize) && (ghost.currentPosition_x % cellSize) <= ((cellSize / 2) + 1) && 
-       ((cellSize / 2) - 1) <= (ghost.currentPosition_y % cellSize) && (ghost.currentPosition_y % cellSize) <= ((cellSize / 2) + 1) ) {
+    if ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x - (x_pos * cellSize)) && (ghost.currentPosition_x - (x_pos * cellSize)) <= ((cellSize / 2) + 1) && 
+       ((cellSize / 2) - 1) <= (ghost.currentPosition_y - (y_pos * cellSize)) && (ghost.currentPosition_y - (y_pos * cellSize)) <= ((cellSize / 2) + 1) ) {
       
       // resets ghost to center of the cell
       ghost.currentPosition_x = (x_pos * cellSize) + (cellSize / 2);
@@ -370,27 +411,30 @@ function MoveGhosts() {
 
 }
 
-
 function renderGhost() {
-  let i = 0;
+  let ghost_no = 0;
+
   // drawing the ghosts
   ghosts.forEach(ghost => {
+    //checks if ghost is scared and changes parameters accordingly
+    if (powerTime > 0 && !ghost.isDead) ghost.IsScared = true;
+    else ghost.IsScared = false;
 
-    //checks if ghost is scared or not
-    if (powerTime > 0) {
+    if (ghost.IsScared) {
       ghost.image = ghost_scared;
+      ghost.speed = ghost_speeds[ghost_no] / 1.50;
     }
     else {
-      ghost.image = ghost_images[i];
+      ghost.image = ghost_images[ghost_no];
+      ghost.speed = ghost_speeds[ghost_no];
     }
     
     ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
-    i++;
+    ghost_no++;
   })
   if (score == 0) return;
   MoveGhosts();
 }
-
 
 function renderGrid() {
   for (let col of grid) {
@@ -402,7 +446,6 @@ function renderGrid() {
     game.appendChild(gridCol);
   }
 }
-
 
 function animatePac() {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -442,14 +485,20 @@ function animatePac() {
 
   if (powerTime > 0) {
     powerTime --;
+    playSound(power_audio);
   }
-  
+  else {
+    ghostsEaten = 0;
+    ghosts.forEach(ghost => {
+      ghost.isDead = false;
+    })
+  }
+
   // if(dir === 0 || dir === 3) eatCell(grid[x_grid][y_grid]);
   // else if(dir === 2) eatCell(grid[x_grid + 1][y_grid]);
   // else eatCell(grid[x_grid][y_grid + 1]);
   if (lives != 0) {
     requestAnimationFrame(animatePac);
-    // GameEnd();
   }
 }
 
@@ -467,12 +516,6 @@ function renderPac() {
   ctx.translate(-x, -y);
   // ctx.restore();
 }
-
-
-function GameEnd() {
-  return;
-}
-
 
 function PacReset() {
   state = 0;
@@ -508,19 +551,43 @@ function restart() {
   ghosts.forEach( ghostNew => {
     ghostNew.currentPosition_x = ghostNew.startPosition_x;
     ghostNew.currentPosition_y = ghostNew.startPosition_y;
+    ghostNew.hasLeft = false;
   } )
   lives = 3;
+  highScore = Math.max(score, highScore);
   score = 0;
   powerTime = 0;
   PacReset();
 }
 
-function init() {
-  window.addEventListener("load", () => setTimeout( function (event) {
+function startWebpage () {  
+
+  var gif = document.createElement('img');
+  gif.classList.add('pacman');
+  gif.src = "pacman_characters/pacman_animation.gif";
+  var h1 = document.createElement('h1');
+  h1.classList.add("title-preload");
+  const preloader = document.querySelector("#pre");
+  preloader.appendChild(h1);
+  preloader.appendChild(gif);
+
+  // playSound(intro_music, 1);
+
+  setTimeout( function (event) {
     const preloader = document.querySelector("#pre");
     preloader.classList.add("finish-load");
     main();
-  }, 0));
+  }, 200)
+
+} 
+
+function init() {
+  const button_click = document.getElementById("start_button");
+  button_click.addEventListener('click', function() {    
+    button_click.remove();
+    startWebpage();
+  });
+  
 }
 
 init();
