@@ -76,8 +76,10 @@ const ghost_blue = new Image();
 ghost_blue.src = './pacman_characters/blue_ghost.png';
 const ghost_scared = new Image();
 ghost_scared.src = './pacman_characters/scared_ghost.png';
+const ghost_scared_white = new Image();
+ghost_scared_white.src = 'pacman_characters/ghost_scared_white.png';
 
-const ghost_images = [ghost_red, ghost_pink, ghost_blue, ghost_orange, ghost_scared];
+const ghost_images = [ghost_red, ghost_pink, ghost_blue, ghost_orange, ghost_scared, ghost_scared_white];
 const ghost_speeds = [2.20, 2.80, 2.50, 3.00]
 
 // initialising the ghosts with name, initial coordinates, speed, and image src
@@ -164,8 +166,6 @@ const death = new Audio();
 death.src = './sounds/Death.mp3';
 const powerPill = new Audio();
 powerPill.src = './sounds/eat_powerpill.mp3';
-const ghost = new Audio();
-ghost.src = './sounds/Ghost.mp3';
 const intro_music = new Audio;
 intro_music.src = './sounds/intro-music.mp3';
 const power_audio = new Audio;
@@ -190,7 +190,7 @@ function eatCell() {
     playSound(eatPoint);
     totalPoints--;
     if (map[y_grid][x_grid] === stateMap.powerState) {
-      powerTime += 60*7;
+      powerTime += 60*6;
       playSound(powerPill);
       ghostsEaten = 0;
       ghosts.forEach( ghost => {
@@ -420,8 +420,11 @@ function renderGhost() {
     if (powerTime > 0 && !ghost.isDead) ghost.IsScared = true;
     else ghost.IsScared = false;
 
+    if (powerTime % 100 == 0) console.log(powerTime);
+
     if (ghost.IsScared) {
-      ghost.image = ghost_scared;
+      if (powerTime <= 180 && (powerTime % 50 <= 15)) ghost.image = ghost_scared_white;
+      else ghost.image = ghost_scared;
       ghost.speed = ghost_speeds[ghost_no] / 1.50;
     }
     else {
@@ -571,13 +574,13 @@ function startWebpage () {
   preloader.appendChild(h1);
   preloader.appendChild(gif);
 
-  // playSound(intro_music, 1);
+  playSound(intro_music, 1);
 
   setTimeout( function (event) {
     const preloader = document.querySelector("#pre");
     preloader.classList.add("finish-load");
     main();
-  }, 200)
+  }, 4200)
 
 } 
 
