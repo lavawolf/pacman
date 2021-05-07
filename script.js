@@ -59,7 +59,7 @@ class Ghost{
     this.directionRev = NaN;
     this.IsScared = false;
     this.isDead = false;
-    this.hasLeft = false;
+    this.hasLeftHouse = false; //to check if ghost has left the house
   }
 }
 
@@ -190,7 +190,7 @@ function eatCell() {
     playSound(eatPoint);
     totalPoints--;
     if (map[y_grid][x_grid] === stateMap.powerState) {
-      powerTime += 60*6;
+      powerTime += 60*8;
       playSound(powerPill);
       ghostsEaten = 0;
       ghosts.forEach( ghost => {
@@ -278,7 +278,7 @@ function getPossible(x, y, ghost) {
   for (var k of Object.keys(allowed)) {
     let i = allowed[k];
     if (map[i[1]][i[0]] === 0) delete allowed[k];
-    if (ghost.hasLeft) {
+    if (ghost.hasLeftHouse) {
       if (i[1] == 9 && i[0] == 10) delete allowed[k];
     }
   }
@@ -308,13 +308,13 @@ function IsEaten(ghost) {
   if (JSON.stringify(ghost.currentPosition_x) >= x - 7 && JSON.stringify(ghost.currentPosition_x) <= x + 7 &&
       JSON.stringify(ghost.currentPosition_y) >= y - 7 && JSON.stringify(ghost.currentPosition_y) <= y + 7){
     
-    // ghosts are scared pacman lives
+    // ghost is scared, pacman lives, ghost is reinitialized
     if (ghost.IsScared){
       playSound(eat_ghost);
       playSound(ghost_retreat);
       ghost.currentPosition_x = ghost.startPosition_x;
       ghost.currentPosition_y = ghost.startPosition_y;
-      ghost.hasLeft = false;
+      ghost.hasLeftHouse = false;
       ghost.isDead = true;
       score += 200 * ( 2**ghostsEaten);
       ghostsEaten++;
@@ -330,7 +330,7 @@ function IsEaten(ghost) {
       ghosts.forEach( ghostNew => {
         ghostNew.currentPosition_x = ghostNew.startPosition_x;
         ghostNew.currentPosition_y = ghostNew.startPosition_y;
-        ghostNew.hasLeft = false;
+        ghostNew.hasLeftHouse = false;
       } )
       PacReset();
       // to wait for some time before restarting
@@ -365,28 +365,31 @@ function setDirection (ghost) {
 
 // moving the ghosts
 function MoveGhosts() {
-
   ghosts.forEach(ghost => {
+
     // checks if pacman has eaten ghost
     if (IsEaten(ghost)) return;
-
+    
+    // orange and blue ghost exit later
     if (ghost.className == 'orange' || ghost.className == 'blue') {
       if (score < 150) return;
     }
-
-    let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
-    let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
-
-    if (x_pos == 10 && y_pos == 8) ghost.hasLeft = true;
-
-    //find all possible moves for the ghost
-    let moves = getPossible(x_pos, y_pos, ghost); 
 
     // assign direction to ghost if ghost is at starting point
     if ( JSON.stringify(ghost.startPosition_x) == JSON.stringify(ghost.currentPosition_x) && 
       JSON.stringify(ghost.startPosition_y) == JSON.stringify(ghost.currentPosition_y) ){
       setDirection(ghost);
     }
+
+    // find x, y coordinates of the ghost in the grid
+    let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
+    let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
+
+    // checks if ghost has left house so that it may not enter again
+    if (x_pos == 10 && y_pos == 8) ghost.hasLeftHouse = true;
+
+    //find all possible moves for the ghost
+    let moves = getPossible(x_pos, y_pos, ghost); 
 
     // condition to check if the ghost is near the center of the cell or not
     if ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x - (x_pos * cellSize)) && (ghost.currentPosition_x - (x_pos * cellSize)) <= ((cellSize / 2) + 1) && 
@@ -402,7 +405,8 @@ function MoveGhosts() {
       //selects a random move and updates the direction of the ghost if it is at the end of line
       ghost.direction = Object.keys(moves)[Math.floor(Math.random() * Object.keys(moves).length)]; 
       ghost.directionRev = dirRev[ghost.direction];
-
+      
+      // moves the ghost by one step
       NextMove(ghost);
     }
 
@@ -416,12 +420,11 @@ function renderGhost() {
 
   // drawing the ghosts
   ghosts.forEach(ghost => {
-    //checks if ghost is scared and changes parameters accordingly
+    //checks if ghost is scared
     if (powerTime > 0 && !ghost.isDead) ghost.IsScared = true;
     else ghost.IsScared = false;
 
-    if (powerTime % 100 == 0) console.log(powerTime);
-
+    // changes speed and image of the ghost
     if (ghost.IsScared) {
       if (powerTime <= 180 && (powerTime % 50 <= 15)) ghost.image = ghost_scared_white;
       else ghost.image = ghost_scared;
@@ -435,8 +438,10 @@ function renderGhost() {
     ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
     ghost_no++;
   })
+
+  // if pacman hasn't started, ghosts don't move
   if (score == 0) return;
-  MoveGhosts();
+  else MoveGhosts();
 }
 
 function renderGrid() {
@@ -554,7 +559,7 @@ function restart() {
   ghosts.forEach( ghostNew => {
     ghostNew.currentPosition_x = ghostNew.startPosition_x;
     ghostNew.currentPosition_y = ghostNew.startPosition_y;
-    ghostNew.hasLeft = false;
+    ghostNew.hasLeftHouse = false;
   } )
   lives = 3;
   highScore = Math.max(score, highScore);
@@ -564,7 +569,6 @@ function restart() {
 }
 
 function startWebpage () {  
-
   var gif = document.createElement('img');
   gif.classList.add('pacman');
   gif.src = "pacman_characters/pacman_animation.gif";
@@ -575,13 +579,11 @@ function startWebpage () {
   preloader.appendChild(gif);
 
   playSound(intro_music, 1);
-
   setTimeout( function (event) {
     const preloader = document.querySelector("#pre");
     preloader.classList.add("finish-load");
     main();
-  }, 4200)
-
+  }, 4200);
 } 
 
 function init() {
@@ -590,7 +592,6 @@ function init() {
     button_click.remove();
     startWebpage();
   });
-  
 }
 
 init();
