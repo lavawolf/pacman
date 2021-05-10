@@ -39,6 +39,8 @@ const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 const scoreboard = document.querySelector('#scoreboard');
 const scoreDisplay = document.querySelector('#score');
+const scoreTitle = document.querySelector('#scoretitle');
+const livesDisplay = document.querySelector('#lives');
 
 const pac1 = new Image();
 pac1.src = './pacman_characters/pacman_closed.png';
@@ -224,7 +226,9 @@ function turn() {
 
 
 function main() {
-  root.style.setProperty('--scale', Math.min(window.innerWidth / 1441, window.innerHeight / 952));
+  scoreboard.style.visibility = 'visible';
+  document.querySelector('#title').style.visibility = 'visible';
+  root.style.setProperty('--scale', Math.min(window.innerWidth / 1473, window.innerHeight / 952));
   const h = gridHeight * cellSize;
   const w = gridWidth * cellSize;
   game.style.height = `${h}px`;
@@ -235,6 +239,18 @@ function main() {
   ctx.canvas.width = w;
   scoreboard.style.height = game.style.height;
   game.style.border = '2px solid blue';
+
+  let blehbleh = document.createElement('img');
+  blehbleh.src = pac2.src;
+  blehbleh.style.visibility = 'hidden';
+  blehbleh.style.width = '0.1px';
+  livesDisplay.appendChild(blehbleh);
+
+  for(let i = 0; i < lives; i++) {
+    let temp = document.createElement('img')
+    temp.src = pac2.src;
+    livesDisplay.appendChild(temp);
+  }
 
   window.addEventListener('keydown', (event) => {
     event.preventDefault();
@@ -325,6 +341,8 @@ function IsEaten(ghost) {
       lives--;
       playSound(death);
       powerTime = 0;
+
+      livesDisplay.removeChild(livesDisplay.lastChild);
 
       //reinitialize ghosts and pacman positions
       ghosts.forEach( ghostNew => {
@@ -561,9 +579,16 @@ function restart() {
     ghostNew.currentPosition_y = ghostNew.startPosition_y;
     ghostNew.hasLeftHouse = false;
   } )
+  for(let i = 0; i < lives; i++) {
+    livesDisplay.removeChild(livesDisplay.lastChild);
+  }
   lives = 3;
+  for(let i = 0; i < lives; i++) {
+    let temp = document.createElement('img')
+    temp.src = pac2.src;
+    livesDisplay.appendChild(temp);
+  }
   highScore = Math.max(score, highScore);
-  score = 0;
   powerTime = 0;
   PacReset();
 }
@@ -573,10 +598,13 @@ function startWebpage () {
   gif.classList.add('pacman');
   gif.src = "pacman_characters/pacman_animation.gif";
   var h1 = document.createElement('h1');
+  h1.textContent = "PA1MAN";
   h1.classList.add("title-preload");
+  document.querySelector('body').appendChild(h1);
   const preloader = document.querySelector("#pre");
   preloader.appendChild(h1);
   preloader.appendChild(gif);
+  
 
   playSound(intro_music, 1);
   setTimeout( function (event) {
