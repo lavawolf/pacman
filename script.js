@@ -29,7 +29,6 @@ const cellSize = 40;
 const pacSize = 26;
 
 const ghostSize = 30;
-const line_margin = 7;
 const pacSpeed = 3;
 const ghostSpeed = 2;
 
@@ -39,8 +38,9 @@ const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 const scoreboard = document.querySelector('#scoreboard');
 const scoreDisplay = document.querySelector('#score');
-const scoreTitle = document.querySelector('#scoretitle');
+const levelDisplay = document.querySelector('#level');
 const livesDisplay = document.querySelector('#lives');
+const highScoreDisplay = document.querySelector('#highscore');
 
 const pac1 = new Image();
 pac1.src = './pacman_characters/pacman_closed.png';
@@ -81,8 +81,9 @@ ghost_scared.src = './pacman_characters/scared_ghost.png';
 const ghost_scared_white = new Image();
 ghost_scared_white.src = 'pacman_characters/ghost_scared_white.png';
 
+let level = 1;
 const ghost_images = [ghost_red, ghost_pink, ghost_blue, ghost_orange, ghost_scared, ghost_scared_white];
-const ghost_speeds = [2.20, 2.80, 2.50, 3.00]
+const ghost_speeds = [2.40, 2.80, 2.50, 3.00]
 
 // initialising the ghosts with name, initial coordinates, speed, and image src
 const ghosts = [
@@ -125,6 +126,8 @@ let queryDir = 0;
 let totalPoints = 0;
 let powerTime = 0;
 let ghostsEaten = 0;
+let pacmanMoving = false;
+let restartGame = false;
 
 let score = 0;
 let highScore = 0;
@@ -192,7 +195,7 @@ function eatCell() {
     playSound(eatPoint);
     totalPoints--;
     if (map[y_grid][x_grid] === stateMap.powerState) {
-      powerTime += 60*8;
+      powerTime = 60*7;
       playSound(powerPill);
       ghostsEaten = 0;
       ghosts.forEach( ghost => {
@@ -201,7 +204,7 @@ function eatCell() {
     }
     if(totalPoints === 0) restart();
   }
-  scoreDisplay.textContent = score;
+  scoreDisplay.textContent = 'Score ' + score;
 }
 
 function turn() {
@@ -239,6 +242,7 @@ function main() {
   ctx.canvas.width = w;
   scoreboard.style.height = game.style.height;
   game.style.border = '2px solid blue';
+  levelDisplay.textContent = 'Level ' + level;
 
   let blehbleh = document.createElement('img');
   blehbleh.src = pac2.src;
@@ -253,6 +257,7 @@ function main() {
   }
 
   window.addEventListener('keydown', (event) => {
+    pacmanMoving = true;
     event.preventDefault();
     queryDir = dirMap[event.key];
     queryTicks = Math.floor(cellSize / pacSpeed);
@@ -278,13 +283,6 @@ function main() {
   requestAnimationFrame(animatePac);
 }
 
-
-async function wait() {
-  await sleep (1800);
-}
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 // returns valid cells to move from the adjacent cells of the current cell
 function getPossible(x, y, ghost) {
   let allowed = {'left': [x - 1, y],
@@ -301,6 +299,7 @@ function getPossible(x, y, ghost) {
   return allowed;
 }
 
+// Moves the ghost in the direction it is already moviing in
 function NextMove(ghost) {
   switch (ghost.direction) {
     case 'left': 
@@ -351,8 +350,6 @@ function IsEaten(ghost) {
         ghostNew.hasLeftHouse = false;
       } )
       PacReset();
-      // to wait for some time before restarting
-      // wait();
     }
     return true;
   }
@@ -388,9 +385,14 @@ function MoveGhosts() {
     // checks if pacman has eaten ghost
     if (IsEaten(ghost)) return;
     
-    // orange and blue ghost exit later
-    if (ghost.className == 'orange' || ghost.className == 'blue') {
-      if (score < 150) return;
+    // orange ghost exits at 120 points
+    if (ghost.className == 'orange') {
+      if (score < 120) return;
+    }
+
+    // blue ghost exits at 80 points
+    if (ghost.className == 'blue'){
+      if (score < 80) return;
     }
 
     // assign direction to ghost if ghost is at starting point
@@ -403,15 +405,15 @@ function MoveGhosts() {
     let x_pos = Math.floor(ghost.currentPosition_x / cellSize);
     let y_pos = Math.floor(ghost.currentPosition_y / cellSize);
 
-    // checks if ghost has left house so that it may not enter again
-    if (x_pos == 10 && y_pos == 8) ghost.hasLeftHouse = true;
-
     //find all possible moves for the ghost
-    let moves = getPossible(x_pos, y_pos, ghost); 
+    let moves = getPossible(x_pos, y_pos, ghost);
+
+    // checks if ghost has left house so that it may not enter again
+    if (x_pos == 10 && y_pos == 8) ghost.hasLeftHouse = true; 
 
     // condition to check if the ghost is near the center of the cell or not
-    if ( ((cellSize / 2) - 1) <= (ghost.currentPosition_x - (x_pos * cellSize)) && (ghost.currentPosition_x - (x_pos * cellSize)) <= ((cellSize / 2) + 1) && 
-       ((cellSize / 2) - 1) <= (ghost.currentPosition_y - (y_pos * cellSize)) && (ghost.currentPosition_y - (y_pos * cellSize)) <= ((cellSize / 2) + 1) ) {
+    if ( ((cellSize / 2) - 1.5) <= (ghost.currentPosition_x - (x_pos * cellSize)) && (ghost.currentPosition_x - (x_pos * cellSize)) <= ((cellSize / 2) + 1.5) && 
+       ((cellSize / 2) - 1.5) <= (ghost.currentPosition_y - (y_pos * cellSize)) && (ghost.currentPosition_y - (y_pos * cellSize)) <= ((cellSize / 2) + 1.5) ) {
       
       // resets ghost to center of the cell
       ghost.currentPosition_x = (x_pos * cellSize) + (cellSize / 2);
@@ -446,7 +448,7 @@ function renderGhost() {
     if (ghost.IsScared) {
       if (powerTime <= 180 && (powerTime % 50 <= 15)) ghost.image = ghost_scared_white;
       else ghost.image = ghost_scared;
-      ghost.speed = ghost_speeds[ghost_no] / 1.50;
+      ghost.speed = ghost_speeds[ghost_no] - 0.70;
     }
     else {
       ghost.image = ghost_images[ghost_no];
@@ -458,7 +460,7 @@ function renderGhost() {
   })
 
   // if pacman hasn't started, ghosts don't move
-  if (score == 0) return;
+  if (!pacmanMoving) return;
   else MoveGhosts();
 }
 
@@ -520,17 +522,15 @@ function animatePac() {
     })
   }
 
-  // if(dir === 0 || dir === 3) eatCell(grid[x_grid][y_grid]);
-  // else if(dir === 2) eatCell(grid[x_grid + 1][y_grid]);
-  // else eatCell(grid[x_grid][y_grid + 1]);
-  if (lives != 0) {
-    requestAnimationFrame(animatePac);
+  // Asks user to start a new game
+  if (lives === 0 && !restartGame) {
+    newGame();
+    restartGame = true;
   }
+  if (lives != 0) requestAnimationFrame(animatePac);
 }
 
-
 function renderPac() {
-  // ctx.save();
   ctx.translate(x, y);
   ctx.rotate(-Math.PI * dir / 2);
   if (state > 10) {
@@ -540,7 +540,6 @@ function renderPac() {
   }
   ctx.rotate(Math.PI * dir / 2);
   ctx.translate(-x, -y);
-  // ctx.restore();
 }
 
 function PacReset() {
@@ -554,6 +553,22 @@ function PacReset() {
   y_grid = 1;
   queryTicks = 0;
   queryDir = 0;
+  pacmanMoving = false;
+}
+
+function newGame() {
+  let tempbutton = document.createElement('button');
+  scoreboard.appendChild(tempbutton);
+  tempbutton.classList.add('start_button');
+  tempbutton.textContent = 'Play Again';
+  tempbutton.style.height = '8%';
+  tempbutton.style.width = '15%';
+  tempbutton.style.fontSize = '100%';
+  tempbutton.addEventListener('click', function (){
+    tempbutton.remove();
+    requestAnimationFrame(animatePac);
+    restart();
+  })
 }
 
 function restart() {
@@ -579,6 +594,17 @@ function restart() {
     ghostNew.currentPosition_y = ghostNew.startPosition_y;
     ghostNew.hasLeftHouse = false;
   } )
+
+  if (restartGame) {
+    level = 1;
+    highScore = Math.max(score, highScore);
+    highScoreDisplay.textContent = 'High Score ' + highScore;
+    score = 0;
+    restartGame = false;
+  }
+  else level++;
+  
+  // updating lives display
   for(let i = 0; i < lives; i++) {
     livesDisplay.removeChild(livesDisplay.lastChild);
   }
@@ -588,8 +614,9 @@ function restart() {
     temp.src = pac2.src;
     livesDisplay.appendChild(temp);
   }
-  highScore = Math.max(score, highScore);
+
   powerTime = 0;
+  levelDisplay.textContent = 'Level ' + level;
   PacReset();
 }
 
@@ -604,7 +631,6 @@ function startWebpage () {
   const preloader = document.querySelector("#pre");
   preloader.appendChild(h1);
   preloader.appendChild(gif);
-  
 
   playSound(intro_music, 1);
   setTimeout( function (event) {
@@ -615,9 +641,9 @@ function startWebpage () {
 } 
 
 function init() {
-  const button_click = document.getElementById("start_button");
-  button_click.addEventListener('click', function() {    
-    button_click.remove();
+  const button_click = document.getElementsByClassName("start_button");
+  button_click[0].addEventListener('click', function() {    
+    button_click[0].remove();
     startWebpage();
   });
 }

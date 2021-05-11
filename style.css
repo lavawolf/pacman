@@ -91,15 +91,10 @@ body {
 }
 
 #scoreboard {
-  /* border: 2px solid green; */
   visibility: hidden;
   width: 100%;
   color: white;
-  /* margin: 50px; */
   font-family: 'emulogic';
-  /* position: relative; */
-  /* top: -200%; */
-  /* justify-content: center; */
 }
 
 canvas {
@@ -110,11 +105,12 @@ canvas {
 
 /*Preloading page CSS properties*/
 
-#start_button  {
+.start_button {
+  font-family: 'pacfontregular';
   position: relative;
   align-items: center;
-  width: 15%;
-  height: 15vh;
+  width: 25%;
+  height: 20%;
   background-color: yellow;
   display: flex;
   justify-content: center;
