@@ -572,19 +572,20 @@ function newGame() {
 }
 
 function restart() {
+  totalPoints = 0;
   for(let x = 0; x < grid.length; x++) {
     for(let y = 0; y < grid[0].length; y++) {
       const cell = grid[x][y]
       if(map[y][x] === stateMap.pointState) {
         let childPoint = document.createElement('div');
         childPoint.classList.add('point');
-        cell.appendChild(childPoint);
+        if(!cell.lastChild) cell.appendChild(childPoint);
         totalPoints++;
       }
       else if (map[y][x] === stateMap.powerState){
         let child = document.createElement('div');
         child.classList.add('power');
-        cell.appendChild(child);
+        if(!cell.lastChild) cell.appendChild(child);
         totalPoints++;
       }
     }
