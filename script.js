@@ -577,7 +577,7 @@ function newGame() {
   let tempbutton = document.createElement('button');
   scoreboard.appendChild(tempbutton);
   tempbutton.classList.add('start_button');
-  tempbutton.textContent = 'PlAy aGaIn';
+  tempbutton.textContent = 'play again';
   tempbutton.style.height = '8%';
   tempbutton.style.width = '15%';
   tempbutton.style.fontSize = '100%';
@@ -650,12 +650,12 @@ function startWebpage () {
   preloader.appendChild(h1);
   preloader.appendChild(gif);
 
-  // playSound(intro_music, 1);
+  playSound(intro_music, 1);
   setTimeout( function (event) {
     const preloader = document.querySelector("#pre");
     preloader.classList.add("finish-load");
     main();
-  }, 200);
+  }, 4200);
 } 
 
 function init() {

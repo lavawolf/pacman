@@ -34,6 +34,11 @@ body {
   visibility: hidden;
 }
 
+.centered{
+  margin-left: auto; 
+  margin-right: auto;
+}
+
 #game {
   overflow: hidden;
   align-items: center;
