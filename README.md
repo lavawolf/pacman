@@ -27,7 +27,7 @@ As soon as the document is loaded, the `init()` function is called which adds a 
 
 The constant `ghosts` declares all the four ghosts.
 
-The function `renderGhost()` draws all four ghosts using the array ghosts. It checks if the ghost is scared, if so, the ghost's image is changed and it slows down. Then the ghost is drawn at its current position. If the pacman hasn't started though, the ghosts don't move, and the function returns but otherwise it calls `MoveGhosts` which specify how the ghosts move.
+The function `renderGhost()` draws all four ghosts using the array ghosts. It checks if the ghost is scared, if so, the ghost's image is changed and it slows down. Moreover, at each level, the speed of all ghosts increases by 0.5px/s, this ensures an increase in the difficulty of the game at each level by an undisclosed polynomial factor. Further in the function, the ghost is drawn at its current position. If the pacman hasn't started though, the ghosts don't move, and the function returns but otherwise it calls `MoveGhosts` which specify how the ghosts move.
 
 The function `MoveGhosts()` does the following: 
 
@@ -47,7 +47,7 @@ The `NextMove()` function is a simple function that uses switch case to move the
 
 ## When all points have been eaten
 
-If totalpoints left in the game are zero, the `restart()` function is called which updates the level of the game and resets all playing conditions back to the initial stage except the score which is not changed. The `lives` are also updated to 3.
+If totalpoints left in the game are zero, the `restart()` function is called which updates the level of the game and resets all playing conditions back to the initial stage except the score which is not changed. The `lives` are also updated to 3 and the game starts as soon as the player presses a key. This instruction is added each time the pacman's position is reinitialized.
 
 ## When all lives are lost
 

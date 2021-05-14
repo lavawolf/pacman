@@ -41,6 +41,10 @@ const scoreDisplay = document.querySelector('#score');
 const levelDisplay = document.querySelector('#level');
 const livesDisplay = document.querySelector('#lives');
 const highScoreDisplay = document.querySelector('#highscore');
+const instruction = document.createElement('div');
+instruction.id = 'instruction';
+instruction.style.color = 'yellow';
+instruction.textContent = 'Press any key to start';
 
 const pac1 = new Image();
 pac1.src = './pacman_characters/pacman_closed.png';
@@ -49,13 +53,13 @@ pac2.src = './pacman_characters/pacman_eating.png';
 
 // initializes the ghost object
 class Ghost{
-  constructor(Name, start, speed, image) {
+  constructor(Name, start, number, image) {
     this.className = Name;
     this.startPosition_x = start[0];
     this.startPosition_y = start[1];
     this.currentPosition_x = start[0];
     this.currentPosition_y = start[1];
-    this.speed = speed;
+    this.speed = ghost_speeds[number];
     this.image = image;
     this.direction = NaN;
     this.directionRev = NaN;
@@ -81,17 +85,17 @@ ghost_scared.src = './pacman_characters/scared_ghost.png';
 const ghost_scared_white = new Image();
 ghost_scared_white.src = 'pacman_characters/ghost_scared_white.png';
 
-let level = 1;
+let level = 1.0;
 const ghost_images = [ghost_red, ghost_pink, ghost_blue, ghost_orange, ghost_scared, ghost_scared_white];
-let ghost_speeds = 2.0 + (0.5 * level);
-console.log(ghost_speeds, level);
+let ghost_speeds = [2.2, 2.4, 2.8, 3.0];
+
 
 // initialising the ghosts with name, initial coordinates, speed, and image src
-const ghosts = [
-  new Ghost('red', [420, 380], ghost_speeds, ghost_red), 
-  new Ghost('pink', [420, 420], ghost_speeds, ghost_pink), 
-  new Ghost('blue', [460, 420], ghost_speeds, ghost_blue), 
-  new Ghost('orange', [380, 420], ghost_speeds, ghost_orange) ];
+let ghosts = [
+  new Ghost('red', [420, 380], 0, ghost_red), 
+  new Ghost('pink', [420, 420], 1, ghost_pink), 
+  new Ghost('blue', [460, 420], 2, ghost_blue), 
+  new Ghost('orange', [380, 420], 3, ghost_orange) ];
 
 // defines the state of each cell
 const stateMap = {
@@ -129,6 +133,7 @@ let powerTime = 0;
 let ghostsEaten = 0;
 let pacmanMoving = false;
 let restartGame = false;
+let instr_removed = false;
 
 let score = 0;
 let highScore = 0;
@@ -245,6 +250,7 @@ function main() {
   game.style.border = '2px solid blue';
   levelDisplay.textContent = 'Level ' + level;
 
+  scoreboard.appendChild(instruction);
   let blehbleh = document.createElement('img');
   blehbleh.src = pac2.src;
   blehbleh.style.visibility = 'hidden';
@@ -441,6 +447,7 @@ function renderGhost() {
 
   // drawing the ghosts
   ghosts.forEach(ghost => {
+
     //checks if ghost is scared
     if (powerTime > 0 && !ghost.isDead) ghost.IsScared = true;
     else ghost.IsScared = false;
@@ -449,20 +456,25 @@ function renderGhost() {
     if (ghost.IsScared) {
       if (powerTime <= 180 && (powerTime % 50 <= 15)) ghost.image = ghost_scared_white;
       else ghost.image = ghost_scared;
-      ghost.speed = ghost_speeds - 0.50;
+      ghost.speed = (ghost_speeds[ghost_no] + (ghost.speed/5) * (level - 1.0)) / 1.40;
     }
     else {
       ghost.image = ghost_images[ghost_no];
-      ghost.speed = ghost_speeds;
+      ghost.speed = ghost_speeds[ghost_no] + (ghost.speed/5) * (level - 1.0);
     }
-    
     ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
     ghost_no++;
   })
 
   // if pacman hasn't started, ghosts don't move
   if (!pacmanMoving) return;
-  else MoveGhosts();
+  else {
+    if (!instr_removed) {
+      scoreboard.removeChild(instruction);
+      instr_removed = true;
+    }
+    MoveGhosts();
+  }
 }
 
 function renderGrid() {
@@ -555,13 +567,17 @@ function PacReset() {
   queryTicks = 0;
   queryDir = 0;
   pacmanMoving = false;
+  if (lives !== 0) {
+    instr_removed = false;
+    scoreboard.appendChild(instruction);
+  }
 }
 
 function newGame() {
   let tempbutton = document.createElement('button');
   scoreboard.appendChild(tempbutton);
   tempbutton.classList.add('start_button');
-  tempbutton.textContent = 'Play Again';
+  tempbutton.textContent = 'PlAy aGaIn';
   tempbutton.style.height = '8%';
   tempbutton.style.width = '15%';
   tempbutton.style.fontSize = '100%';
@@ -591,7 +607,6 @@ function restart() {
       }
     }
   }
-  console.log(ghost_speeds);
   ghosts.forEach( ghostNew => {
     ghostNew.currentPosition_x = ghostNew.startPosition_x;
     ghostNew.currentPosition_y = ghostNew.startPosition_y;
@@ -599,13 +614,13 @@ function restart() {
   } )
 
   if (restartGame) {
-    level = 1;
+    level = 1.0;
     highScore = Math.max(score, highScore);
     highScoreDisplay.textContent = 'High Score ' + highScore;
     score = 0;
     restartGame = false;
   }
-  else level++;
+  else level+=1.0;
   
   // updating lives display
   for(let i = 0; i < lives; i++) {
@@ -635,12 +650,12 @@ function startWebpage () {
   preloader.appendChild(h1);
   preloader.appendChild(gif);
 
-  playSound(intro_music, 1);
+  // playSound(intro_music, 1);
   setTimeout( function (event) {
     const preloader = document.querySelector("#pre");
     preloader.classList.add("finish-load");
     main();
-  }, 4200);
+  }, 200);
 } 
 
 function init() {
