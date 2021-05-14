@@ -83,14 +83,15 @@ ghost_scared_white.src = 'pacman_characters/ghost_scared_white.png';
 
 let level = 1;
 const ghost_images = [ghost_red, ghost_pink, ghost_blue, ghost_orange, ghost_scared, ghost_scared_white];
-const ghost_speeds = [2.40, 2.80, 2.50, 3.00]
+let ghost_speeds = 2.0 + (0.5 * level);
+console.log(ghost_speeds, level);
 
 // initialising the ghosts with name, initial coordinates, speed, and image src
 const ghosts = [
-  new Ghost('red', [420, 380], ghost_speeds[0], ghost_red), 
-  new Ghost('pink', [420, 420], ghost_speeds[1], ghost_pink), 
-  new Ghost('blue', [460, 420], ghost_speeds[2], ghost_blue), 
-  new Ghost('orange', [380, 420], ghost_speeds[3], ghost_orange) ];
+  new Ghost('red', [420, 380], ghost_speeds, ghost_red), 
+  new Ghost('pink', [420, 420], ghost_speeds, ghost_pink), 
+  new Ghost('blue', [460, 420], ghost_speeds, ghost_blue), 
+  new Ghost('orange', [380, 420], ghost_speeds, ghost_orange) ];
 
 // defines the state of each cell
 const stateMap = {
@@ -412,8 +413,8 @@ function MoveGhosts() {
     if (x_pos == 10 && y_pos == 8) ghost.hasLeftHouse = true; 
 
     // condition to check if the ghost is near the center of the cell or not
-    if ( ((cellSize / 2) - 1.5) <= (ghost.currentPosition_x - (x_pos * cellSize)) && (ghost.currentPosition_x - (x_pos * cellSize)) <= ((cellSize / 2) + 1.5) && 
-       ((cellSize / 2) - 1.5) <= (ghost.currentPosition_y - (y_pos * cellSize)) && (ghost.currentPosition_y - (y_pos * cellSize)) <= ((cellSize / 2) + 1.5) ) {
+    if ( ((cellSize / 2) - ghost.speed / 2) <= (ghost.currentPosition_x - (x_pos * cellSize)) && (ghost.currentPosition_x - (x_pos * cellSize)) <= ((cellSize / 2) + ghost.speed / 2) && 
+       ((cellSize / 2) - ghost.speed / 2) <= (ghost.currentPosition_y - (y_pos * cellSize)) && (ghost.currentPosition_y - (y_pos * cellSize)) <= ((cellSize / 2) + ghost.speed / 2) ) {
       
       // resets ghost to center of the cell
       ghost.currentPosition_x = (x_pos * cellSize) + (cellSize / 2);
@@ -448,11 +449,11 @@ function renderGhost() {
     if (ghost.IsScared) {
       if (powerTime <= 180 && (powerTime % 50 <= 15)) ghost.image = ghost_scared_white;
       else ghost.image = ghost_scared;
-      ghost.speed = ghost_speeds[ghost_no] - 0.70;
+      ghost.speed = ghost_speeds - 0.50;
     }
     else {
       ghost.image = ghost_images[ghost_no];
-      ghost.speed = ghost_speeds[ghost_no];
+      ghost.speed = ghost_speeds;
     }
     
     ctx.drawImage(ghost.image, ghost.currentPosition_x  - ghostSize / 2, ghost.currentPosition_y - ghostSize / 2, ghostSize, ghostSize);
@@ -589,6 +590,7 @@ function restart() {
       }
     }
   }
+  console.log(ghost_speeds);
   ghosts.forEach( ghostNew => {
     ghostNew.currentPosition_x = ghostNew.startPosition_x;
     ghostNew.currentPosition_y = ghostNew.startPosition_y;
